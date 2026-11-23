@@ -13,6 +13,14 @@ Backend source inspected: `Roblox/Roblox.Website/Controllers/v1` and `v2`
 
 The Kandi archive declares **191 API methods across 26 modules**. All method definitions currently have empty paths (`p: ""`), so none is connected by this document alone.
 
+## Kandi adapter endpoints added on this branch
+
+| Method | Route | Purpose | Status |
+|---|---|---|---|
+| GET | `/kandi/v1/session` | Returns the current Pekora cookie session as `{ id, username, displayName, isStaff }`; unauthenticated requests return JSON 401. | Added; compile/runtime test still pending |
+
+This endpoint deliberately returns only fields that can be sourced from the active session and staff lookup. It does not invent currency, tickets, thumbnails or permission arrays.
+
 ## Verified backend route families
 
 | Backend controller | Base route | Verified examples |
