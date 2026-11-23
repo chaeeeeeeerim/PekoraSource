@@ -15,11 +15,10 @@ var domain = AppDomain.CurrentDomain;
 // Set a timeout interval of 5 seconds.
 domain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromSeconds(5));
 
-IConfiguration configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json")
-    .Build();
-
+// Use ASP.NET Core's standard configuration pipeline so deployment environment
+// variables (including secrets and container settings) are available to the backend.
 var builder = WebApplication.CreateBuilder(args);
+IConfiguration configuration = builder.Configuration;
 
 // DB
 Roblox.Services.Database.Configure(configuration.GetSection("Postgres").Value!);
