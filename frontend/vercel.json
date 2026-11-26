@@ -1,4 +1,22 @@
 {
+  "rewrites": [
+    {
+      "source": "/apisite/:path*",
+      "destination": "/api/backend/apisite/:path*"
+    },
+    {
+      "source": "/kandi/:path*",
+      "destination": "/api/backend/kandi/:path*"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "/api/backend/auth/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/backend/health"
+    }
+  ],
   "redirects": [
     {
       "source": "/admin",
