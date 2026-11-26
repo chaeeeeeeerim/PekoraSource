@@ -1,14 +1,10 @@
-// API "ads" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Advertising methods mapped to the existing Pekora Ads v1 routes.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("ads", {
-  create: E("POST"),
-  serve: E("GET"),
-  mine: E("GET"),
-  sponsorships: E("GET")
+    create: E("POST", { p: "/ads/v1/user-ads/asset/create" }),
+    serve: E("GET", { p: "/ads/v1/sponsored-pages" }),
+    mine: E("GET", { p: "/ads/v1/user-ads/{creatorType}/{creatorId}" }),
+    sponsorships: E("GET", { p: "/ads/v1/sponsored-pages" })
   });
 })();
