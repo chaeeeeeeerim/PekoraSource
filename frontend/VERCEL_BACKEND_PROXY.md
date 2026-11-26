@@ -1,6 +1,6 @@
 # Vercel + PekoraSource backend proxy
 
-The frontend remains static in this repository. Vercel does not run the ASP.NET Core application or the Windows RCCService executable. The rewrites in `vercel.json` send supported API/admin requests through `api/proxy.js` to the separately hosted ASP.NET backend.
+The Vercel project should use `frontend/` as its Root Directory. The browser calls the ASP.NET API through the same-origin `/apisite/` prefix; `vercel.json` rewrites API, admin, asset and thumbnail requests through `api/proxy.js` to the separately hosted ASP.NET backend. Vercel does not run ASP.NET Core or the Windows RCCService executable.
 
 ## Required Vercel setting
 
@@ -16,7 +16,12 @@ The proxy forwards session cookies and the CSRF token and preserves `Set-Cookie`
 
 - Keep the legacy application-based signup flow disabled. The backend now forces `ApplicationsEnabled=false` by default; set `KANDI_DISABLE_APPLICATIONS=false` only if you intentionally restore it. Quick Username/Password signup uses the separate `/v1/signup` route.
 - Serve the ASP.NET application over HTTPS.
-- Configure `BaseUrl` to the backend's public origin.
+- Configure `BaseUrl` to the ASP.NET backend's public origin (the RCC worker uses it to fetch Kandi asset content).
+- The Dockerfile now builds `admin/` with Node/Webpack and copies the generated `admin/public/build/bundle.js` and CSS into the backend image. The real admin interface is served by ASP.NET at `/admin/`; `/Admin/` redirects there.
+- The backend hard-codes the admin owner IDs to UID 1 and UID 2. Other staff permissions do not grant admin-panel access.
+- The old account-application flow is disabled by default. `KANDI_DISABLE_APPLICATIONS=false` is the explicit opt-in to restore it.
+- New account creation is handled by `/apisite/v1/signup`; it does not require Discord application verification and retains username/password validation, IP cooldown and abuse checks.
+- External UGC source imports are disabled unless `KANDI_UGC_ALLOWED_SOURCE_ASSET_IDS` contains comma-separated asset IDs that Kandi owns or is licensed to republish.
 - Keep PostgreSQL and Redis private.
 - Keep the RCC SOAP port private to the backend/worker network. RCCService SOAP can execute submitted Lua scripts and is not an internet-facing API; do not expose its port publicly.
 - On the ASP.NET backend, configure `RCC_SOAP_ENDPOINT` to the private/VPN address of the RCCService 2020 catalog process (the repository's `RCCCatalogRender.bat` uses port `4621`).
