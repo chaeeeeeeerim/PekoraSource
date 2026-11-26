@@ -8,7 +8,7 @@
     applicationStatus: E("GET"),
     applyAccount: E("POST"),
     forgotPassword: E("POST"),
-    login: E("POST", { p: "/auth/v2/login" }),
+    login: E("POST"),
     logout: E("POST", { p: "/auth/v2/logout" }),
     me: E("GET", {
       p: "/users/v1/users/authenticated",
@@ -18,7 +18,7 @@
       }
     }),
     resetPassword: E("POST"),
-    signup: E("POST", { p: "/auth/v2/signup" }),
+    signup: E("POST"),
     twoFactorDisable: E("POST"),
     twoFactorEnable: E("POST"),
     twoFactorStatus: E("GET"),
