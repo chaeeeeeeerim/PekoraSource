@@ -11,7 +11,7 @@
     login: E("POST"),
     logout: E("POST", { p: "/auth/v2/logout" }),
     me: E("GET", {
-      p: "/users/authenticated",
+      p: "/users/v1/users/authenticated",
       adapt: function (r) {
         if (!r || r.id == null || !r.name) return r;
         return { id: r.id, username: r.name, displayName: r.displayName || r.name, isStaff: r.isStaff };
