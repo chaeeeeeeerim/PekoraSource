@@ -12,7 +12,7 @@
   var form=document.getElementById("signup"),status=document.getElementById("status"),error=document.getElementById("error"),button=document.getElementById("submit");
   window.KandiAPI.call("quickAuth.config").then(function(c){
     if(!c.enabled){status.textContent="Quick signup is currently disabled on this test server.";return;}
-    if(!c.siteKey){status.textContent="Signup is not configured: the server has no Turnstile public key.";return;}
+    if(!c.siteKey){status.textContent="Signup is not configured: the server has no hCaptcha public key.";return;}
     form.hidden=false;status.textContent="Complete the security check to create your account.";
     var s=document.createElement("script");s.src="https://js.hcaptcha.com/1/api.js?render=explicit";s.async=true;s.defer=true;
     s.onload=function(){window.hcaptcha.render("captcha",{sitekey:c.siteKey,callback:function(v){token=v;button.disabled=false;}, "expired-callback":function(){token="";button.disabled=true;}});};
