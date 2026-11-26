@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/kandi/login",
+      "destination": "/kandi-login.html"
+    },
+    {
+      "source": "/kandi/signup",
+      "destination": "/kandi-signup.html"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "/api/backend/v1/:path*"
+    },
+    {
       "source": "/apisite/:path*",
       "destination": "/api/backend/apisite/:path*"
     },
