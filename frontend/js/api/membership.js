@@ -1,13 +1,10 @@
-// API "membership" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Membership reads use the existing Pekora PremiumFeatures v1 endpoints.
+// Purchase is not connected: the backend exposes no confirmed purchase route.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("membership", {
-  get: E("GET"),
-  purchase: E("POST"),
-  tiers: E("GET")
+    get: E("GET", { p: "/premiumfeatures/v1/users/{userId}/subscriptions" }),
+    purchase: E("POST"),
+    tiers: E("GET", { p: "/premiumfeatures/v1/products" })
   });
 })();
