@@ -25,7 +25,7 @@ A path being mapped does not guarantee the Kandi request/response DTO is identic
 
 ## Still not implemented / not production-ready
 
-- JSON username/password login and signup are now exposed at `/apisite/auth/v2/login` and `/apisite/auth/v2/signup`. They create the existing Pekora session cookie, validate username/password, and apply per-IP cooldowns. The Discord application/verification flow remains separate and is not required by this quick-login path.
+- The Kandi login page uses Pekora's existing `POST /v1/login` endpoint (including its original rate limits, password checks, session cookie and optional TOTP). Quick signup uses `POST /kandi/v1/auth/signup`, is protected by hCaptcha and IP rate limits, and is disabled unless `KANDI_QUICK_SIGNUP_ENABLED=true` is set on the isolated test backend. Discord application verification is not required for this quick signup path.
 - Referral, feed, reports, site aggregation, and several library/account methods: no compatible backend route was confirmed.
 - Promocode redemption: the route exists but its current implementation always returns a fixed invalid-code response.
 - Notifications: the current route returns placeholder data; persistence and mark-read semantics are not complete.
