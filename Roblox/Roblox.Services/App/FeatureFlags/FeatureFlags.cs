@@ -60,12 +60,25 @@ public static class FeatureFlags
 {
     private static Dictionary<FeatureFlag, bool>? featureFlags { get; set; }
 
+    // The legacy application-based registration flow is intentionally disabled for Kandi.
+    // Set KANDI_DISABLE_APPLICATIONS=false only when that flow is deliberately re-enabled.
+    private static bool ApplicationsMustStayDisabled =>
+        !string.Equals(Environment.GetEnvironmentVariable("KANDI_DISABLE_APPLICATIONS"), "false", StringComparison.OrdinalIgnoreCase);
+
+    private static void ApplyKandiOverrides()
+    {
+        featureFlags ??= new Dictionary<FeatureFlag, bool>();
+        if (ApplicationsMustStayDisabled)
+            featureFlags[FeatureFlag.ApplicationsEnabled] = false;
+    }
+
     public static void StartUpdateFlagTask()
     {
         Task.Run(async () =>
         {
             var failureCount = 0;
             featureFlags = new();
+            ApplyKandiOverrides();
             while (true)
             {
                 try
@@ -99,6 +112,7 @@ public static class FeatureFlags
         {
             // Unset
             featureFlags = new();
+            ApplyKandiOverrides();
             return;
         }
         var deserialized = JsonSerializer.Deserialize<Dictionary<FeatureFlag, bool>>(flags);
@@ -106,10 +120,12 @@ public static class FeatureFlags
         {
             // Unset
             featureFlags = new();
+            ApplyKandiOverrides();
             return;
         }
 
         featureFlags = deserialized;
+        ApplyKandiOverrides();
     }
     private const string featureFlagRedisName = "FeatureFlagsWebV1";
     public static void UpdateFlags()
@@ -152,6 +168,7 @@ public static class FeatureFlags
             throw new Exception("Flags are not set");
         
         featureFlags[flagToEnable] = true;
+        ApplyKandiOverrides();
         await Roblox.Services.Cache.distributed.StringSetAsync(featureFlagRedisName, JsonSerializer.Serialize(featureFlags));
     }
 
@@ -161,6 +178,7 @@ public static class FeatureFlags
             throw new Exception("Flags are not set");
         
         featureFlags[flagToDisable] = false;
+        ApplyKandiOverrides();
         await Roblox.Services.Cache.distributed.StringSetAsync(featureFlagRedisName, JsonSerializer.Serialize(featureFlags));
     }
     
@@ -170,6 +188,7 @@ public static class FeatureFlags
             throw new Exception("Flags are not set");
         
         featureFlags[flagToDisable] = false;
+        ApplyKandiOverrides();
         Roblox.Services.Cache.distributed.StringSet(featureFlagRedisName, JsonSerializer.Serialize(featureFlags));
     }
 
@@ -177,6 +196,7 @@ public static class FeatureFlags
     {
         if (featureFlags == null)
             throw new Exception("Not ready");
+        ApplyKandiOverrides();
         foreach (var flag in Enum.GetValues<FeatureFlag>())
         {
             if (!featureFlags.ContainsKey(flag))
