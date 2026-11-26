@@ -14,8 +14,8 @@
     if(!c.enabled){status.textContent="Quick signup is currently disabled on this test server.";return;}
     if(!c.siteKey){status.textContent="Signup is not configured: the server has no Turnstile public key.";return;}
     form.hidden=false;status.textContent="Complete the security check to create your account.";
-    var s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.defer=true;
-    s.onload=function(){window.turnstile.render("#captcha",{sitekey:c.siteKey,callback:function(v){token=v;button.disabled=false;}, "expired-callback":function(){token="";button.disabled=true;}});};
+    var s=document.createElement("script");s.src="https://js.hcaptcha.com/1/api.js?render=explicit";s.async=true;s.defer=true;
+    s.onload=function(){window.hcaptcha.render("captcha",{sitekey:c.siteKey,callback:function(v){token=v;button.disabled=false;}, "expired-callback":function(){token="";button.disabled=true;}});};
     document.head.appendChild(s);
   }).catch(function(e){status.textContent=e.message||"Could not load signup settings.";});
   form.addEventListener("submit",async function(ev){
@@ -26,7 +26,7 @@
     try{
       await window.KandiAPI.call("quickAuth.signup",{body:{username:form.username.value.trim(),password:form.password.value,captchaToken:token}});
       location.replace("app.html#home");
-    }catch(e){error.textContent=e.message||"Could not create the account.";if(window.turnstile)window.turnstile.reset();}
+    }catch(e){error.textContent=e.message||"Could not create the account.";if(window.hcaptcha)window.hcaptcha.reset();}
     finally{token="";button.disabled=true;button.textContent="Create Account";}
   });
 })();
