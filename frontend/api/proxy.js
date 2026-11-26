@@ -1,10 +1,6 @@
 const { Readable } = require("node:stream");
 const { pipeline } = require("node:stream/promises");
 
-module.exports.config = {
-  api: { bodyParser: false }
-};
-
 const ALLOWED_PATHS = [
   "/v1/",
   "/admin-api/",
@@ -113,3 +109,5 @@ module.exports = async function proxy(req, res) {
     }
   }
 };
+
+module.exports.config = { api: { bodyParser: false } };
