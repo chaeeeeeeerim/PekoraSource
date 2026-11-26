@@ -3,7 +3,7 @@
   "rewrites": [
     { "source": "/v1/:path*", "destination": "/api/proxy?path=/v1/:path*" },
     { "source": "/admin-api/:path*", "destination": "/api/proxy?path=/admin-api/:path*" },
-    { "source": "/admin", "destination": "/api/proxy?path=/admin" },
+    { "source": "/admin", "destination": "/api/proxy?path=/admin/" },
     { "source": "/admin/:path*", "destination": "/api/proxy?path=/admin/:path*" },
     { "source": "/asset", "destination": "/api/proxy?path=/asset" },
     { "source": "/asset/:path*", "destination": "/api/proxy?path=/asset/:path*" },
