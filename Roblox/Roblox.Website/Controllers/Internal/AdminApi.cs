@@ -1891,7 +1891,7 @@ Thank you for your understanding,
         };
     }
 
-    [HttpGet("lottery/get-users-eligible")]
+    [HttpGet("lottery/get-users-eligible"), StaffFilter(Access.GetStats)]
     public async Task<IEnumerable<UserLotteryEntry>> GetEligibleLotteryUsers()
     {
         var eligibleUsers = await db.QueryAsync<UserLotteryEntry>(
@@ -1904,7 +1904,7 @@ Thank you for your understanding,
         return eligibleUsers;
     }
 
-    [HttpGet("lottery/get-items")]
+    [HttpGet("lottery/get-items"), StaffFilter(Access.GetStats)]
     public async Task<IEnumerable<LotteryItemEntry>> GetLotteryItems()
     {
         var eligibleItems = await db.QueryAsync<LotteryItemEntry>("SELECT a.name, a.id as assetId, a.recent_average_price as recentAveragePrice, u.id as userId, u.online_at as onlineAt, u.username, ua.id as userAssetId FROM user_asset ua INNER JOIN \"user\" u on u.id = ua.user_id INNER JOIN \"asset\" a ON a.id = ua.asset_id WHERE u.id != 1 AND u.id != 12 AND u.online_at <= :time AND (a.is_limited OR a.is_limited_unique) AND NOT a.is_for_sale AND u.status = :status ORDER BY u.online_at LIMIT 1000", new
@@ -1916,7 +1916,7 @@ Thank you for your understanding,
     }
 
 
-    [HttpGet("asset/types")]
+    [HttpGet("asset/types"), StaffFilter(Access.GetStats)]
     public Dictionary<int,string> GetAssetTypes()
     {
         var all = new Dictionary<int, string>();
@@ -1928,7 +1928,7 @@ Thank you for your understanding,
         return all;
     }
 
-    [HttpGet("asset/genres")]
+    [HttpGet("asset/genres"), StaffFilter(Access.GetStats)]
     public Dictionary<int,string> GetAssetGenres()
     {
         var all = new Dictionary<int, string>();
@@ -2668,7 +2668,7 @@ Thank you for your understanding,
             "Hello,\n\nYour username has been reset due to abuse concerns. You can request a new username by contacting a staff member.\n\n-The Roblox Team");
     }
 
-    [HttpPost("users/{userId:long}/verify-user")]
+    [HttpPost("users/{userId:long}/verify-user"), StaffFilter(Access.GetStats)]
     public async Task VerifyUser(long userId)
     {
         if (!IsAdmin())
@@ -2679,7 +2679,7 @@ Thank you for your understanding,
         });
     }
 
-    [HttpPost("users/{userId:long}/unverify-user")]
+    [HttpPost("users/{userId:long}/unverify-user"), StaffFilter(Access.GetStats)]
     public async Task UnverifyUser(long userId)
     {
         if (!IsAdmin())
