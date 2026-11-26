@@ -1,0 +1,19 @@
+{
+  "knex": {
+    "client": "pg",
+    "connection": {
+      "host": "postgres",
+      "port": 5432,
+      "user": "roblox_integration_test_user",
+      "password": "docker",
+      "database": "roblox_integration_test"
+    },
+    "pool": {
+      "min": 1,
+      "max": 5
+    },
+    "migrations": {
+      "directory": "./migrations"
+    }
+  }
+}
