@@ -1,16 +1,12 @@
-// API "friends" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi friends methods mapped to the verified Pekora Friends v1 routes.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("friends", {
-  accept: E("POST"),
-  decline: E("POST"),
-  follow: E("POST"),
-  list: E("GET"),
-  remove: E("POST"),
-  request: E("POST")
+    accept: E("POST", { p: "/friends/v1/users/{userIdToAccept}/accept-friend-request" }),
+    decline: E("POST", { p: "/friends/v1/users/{userIdToDecline}/decline-friend-request" }),
+    follow: E("POST", { p: "/friends/v1/users/{userIdToFollow}/follow" }),
+    list: E("GET", { p: "/friends/v1/users/{userId}/friends" }),
+    remove: E("POST", { p: "/friends/v1/users/{userIdToRemove}/unfriend" }),
+    request: E("POST", { p: "/friends/v1/users/{userIdToRequest}/request-friendship" })
   });
 })();
