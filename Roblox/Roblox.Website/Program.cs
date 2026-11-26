@@ -79,9 +79,8 @@ Roblox.Configuration.SignupAvatarAssetIds =
 Roblox.Configuration.RobloxAppPrefix = "rbxeconsimdev:";
 #endif
 FeatureFlags.StartUpdateFlagTask();
-var ownerUserIdConfig = configuration.GetSection("OwnerUserId");
-List<long> ownerUserIds = ownerUserIdConfig.Get<List<long>>()!;
-Roblox.Website.Filters.StaffFilter.Configure(ownerUserIds!);
+// Kandi bootstrap administrators: only UID 1 and UID 2 may access admin routes.
+Roblox.Website.Filters.StaffFilter.Configure(new List<long> { 1L, 2L });
 //Roblox.Website.Controllers.ThumbnailsControllerV1.StartThumbnailFixLoop();
 
 builder.Services.AddRazorPages();
