@@ -3,14 +3,16 @@
 ## Architecture
 
 - Kandi is served as static files by the same ASP.NET Core application as Pekora.
-- Browser requests use the same origin and the existing Pekora HttpOnly session cookie (.PEKOSECURITY).
+- Browser requests use the existing Pekora HttpOnly session cookie (.PEKOSECURITY); the Vercel preview forwards cookies and CSRF headers through its same-origin proxy.
 - /apisite/ requests are routed to Pekora MVC controllers, not to the legacy frontend proxy.
-- Login and account applications remain on Pekora's original Razor flow. No replacement auth system or Kandi-issued session token is introduced.
+- Kandi quick login/signup use Pekora's existing password hashing and session creation. New users authenticate with Username + Password; Discord application verification is not required for this route.
+- The old account-application flow is disabled by default. The quick signup route retains username/password validation, IP cooldown and abuse checks; login retains the existing password and 2FA checks.
 - CSRF protection remains enabled; the shared API transport retains the x-csrf-token challenge/retry behavior.
 - The root Docker image includes frontend/; a separate Node frontend server is not required.
 
 ## Connected to verified controller routes
 
+- Authentication: POST /apisite/v1/login, POST /apisite/v1/signup, GET /apisite/v1/me and POST /apisite/v1/logout, using the Pekora cookie session.
 - Session and profile: authenticated user, user details, username search/history, user groups, friends, badges and collectible inventory.
 - Friends: friend lists, requests, accept/decline, unfriend and follow.
 - Games: game list/search, universe details, recommendations, voting, badges and game icon thumbnails.
@@ -26,7 +28,6 @@
 
 These Kandi methods have no matching implemented Pekora controller route, or the current UI does not send the complete request contract. They remain unavailable rather than being pointed at guessed endpoints:
 
-- JSON login, signup and logout; account applications continue through the original Pekora Razor flow.
 - Catalog purchases (the UI purchase modal does not yet send the required expected seller, price and currency contract), comments, sales history and recommendations.
 - Game joining, server lists and game favorites.
 - Group wall reading and group game lists.
@@ -39,8 +40,8 @@ Do not simulate purchases, balances, trade outcomes, moderation, or application 
 
 ## Security and deployment
 
-Keep CAPTCHA, password verification, 2FA, session signing keys, database credentials and Discord secrets on the server. Configure PostgreSQL, Redis, storage volumes, base URL and HTTPS in the VPS environment. Never commit secrets or private keys.
+Keep password verification, 2FA, session signing keys, database credentials and Discord secrets on the server. Admin routes and the admin bundle are restricted to UID 1 and UID 2. The Docker build compiles the Svelte admin bundle; Vercel routes /admin and /admin-api to the ASP.NET backend. External UGC imports require an explicit source-asset allowlist so only owned or licensed assets can be republished. RCCService 2020 handles the supported catalog thumbnail types through a private SOAP endpoint; do not expose the SOAP port publicly. Configure PostgreSQL, Redis, storage volumes, base URL, Vercel KANDI_BACKEND_URL and HTTPS in the deployment environment. Never commit secrets or private keys.
 
 ## Verification status
 
-The JavaScript API transport and adapter files passed syntax checks and adapter initialization checks. This does not replace a .NET solution build or live integration test. The branch still needs a successful GitHub Actions build, and a configured VPS is required to verify database/Redis connectivity, login/session round-trip, CSRF, uploads and each feature against real data before merging to main or calling it production-ready.
+The Vercel preview check only reports that there are no unresolved preview comments; it is not a .NET build result. A successful .NET solution build and live integration test are still required. The Vercel preview also needs KANDI_BACKEND_URL set to a running ASP.NET host. Verify database/Redis connectivity, login/session round-trip, CSRF, admin bundle loading, private RCC connectivity and authorized asset imports before merging to main or calling it production-ready.
