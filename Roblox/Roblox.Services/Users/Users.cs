@@ -1313,8 +1313,16 @@ public class UsersService : ServiceBase, IService
         });
         // Render outside transaction to prevent deadlock/unnecessary locks
 #if !DEBUG
-        using var av = ServiceProvider.GetOrCreate<AvatarService>();
-        await av.RedrawAvatar(result.userId, Roblox.Configuration.SignupAvatarAssetIds);
+        // A missing render worker must not turn a successfully created account into a failed signup response.
+        try
+        {
+            using var av = ServiceProvider.GetOrCreate<AvatarService>();
+            await av.RedrawAvatar(result.userId, Roblox.Configuration.SignupAvatarAssetIds);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("[warning] Initial avatar render failed for new user {0}: {1}", result.userId, e.Message);
+        }
 #endif
         return result;
     }
