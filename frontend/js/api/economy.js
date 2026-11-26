@@ -1,17 +1,14 @@
-// API "economy" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi economy read operations mapped to verified Pekora Economy v1 routes.
+// Legacy Robux/Tix exchanges and transaction history remain disconnected until real handlers exist.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("economy", {
-  balance: E("GET"),
-  cancelListing: E("DELETE"),
-  exchangeRobux: E("POST"),
-  exchangeTix: E("POST"),
-  groupFunds: E("GET"),
-  resellerListings: E("GET"),
-  transactions: E("GET")
+    balance: E("GET", { p: "/economy/v1/users/{userId}/currency" }),
+    cancelListing: E("PATCH", { p: "/economy/v1/assets/{assetId}/resellable-copies/{userAssetId}" }),
+    exchangeRobux: E("POST"),
+    exchangeTix: E("POST"),
+    groupFunds: E("GET", { p: "/economy/v1/groups/{groupId}/currency" }),
+    resellerListings: E("GET", { p: "/economy/v1/assets/{assetId}/resellers" }),
+    transactions: E("GET")
   });
 })();
