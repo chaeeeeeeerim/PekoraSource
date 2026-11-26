@@ -1254,7 +1254,7 @@ public class UsersService : ServiceBase, IService
             await InsertAsync("user_economy", "user_id", new
             {
                 user_id = userId,
-                balance_tickets = 0,
+                balance_tickets = 100,
                 balance_robux = 100,
             });
 
