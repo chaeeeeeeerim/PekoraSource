@@ -23,4 +23,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore Roblox\Roblox.sln
     - name: Build
-      run: dotnet build Roblox\Roblox.sln --no-restore
+      run: dotnet build Roblox\Roblox.sln --no-restore --configuration Release
+    - name: Run unit and integration tests
+      run: dotnet test Roblox\Roblox.sln --no-build --configuration Release --logger "trx;LogFileName=test-results.trx"
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-test-results
+        path: "**/TestResults/*.trx"
+        if-no-files-found: ignore
