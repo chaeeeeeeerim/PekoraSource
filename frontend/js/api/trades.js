@@ -1,16 +1,12 @@
-// API "trades" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi trade methods mapped to the verified Pekora Trades v1 routes.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("trades", {
-  accept: E("POST"),
-  counter: E("POST"),
-  create: E("POST"),
-  decline: E("POST"),
-  get: E("GET"),
-  list: E("GET")
+    accept: E("POST", { p: "/trades/v1/trades/{tradeId}/accept" }),
+    counter: E("POST", { p: "/trades/v1/trades/{tradeId}/counter" }),
+    create: E("POST", { p: "/trades/v1/trades/send" }),
+    decline: E("POST", { p: "/trades/v1/trades/{tradeId}/decline" }),
+    get: E("GET", { p: "/trades/v1/trades/{tradeId}" }),
+    list: E("GET", { p: "/trades/v1/trades/{tradeType}" })
   });
 })();
