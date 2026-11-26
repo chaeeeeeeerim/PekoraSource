@@ -1,32 +1,29 @@
-// API "groups" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi group methods mapped to confirmed Pekora Groups v1 endpoints.
+// Features without a matching backend route remain intentionally disconnected.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("groups", {
-  mine: E("GET"),
-  auditLog: E("GET"),
-  changeOwner: E("POST"),
-  create: E("POST"),
-  createRole: E("POST"),
-  deleteRole: E("DELETE"),
-  editRole: E("PATCH"),
-  games: E("GET"),
-  get: E("GET"),
-  join: E("POST"),
-  leave: E("POST"),
-  members: E("GET"),
-  payout: E("POST"),
-  postWall: E("POST"),
-  removeMember: E("DELETE"),
-  roles: E("GET"),
-  search: E("GET"),
-  setMemberRole: E("PATCH"),
-  setPrimary: E("POST"),
-  updateIcon: E("POST"),
-  updateSettings: E("POST"),
-  wall: E("GET")
+    mine: E("GET", { p: "/groups/v1/users/{userId}/groups/roles" }),
+    auditLog: E("GET", { p: "/groups/v1/groups/{groupId}/audit-log" }),
+    changeOwner: E("POST", { p: "/groups/v1/groups/{groupId}/change-owner" }),
+    create: E("POST", { p: "/groups/v1/groups/create" }),
+    createRole: E("POST", { p: "/groups/v1/groups/{groupId}/rolesets/create" }),
+    deleteRole: E("DELETE", { p: "/groups/v1/groups/{groupId}/rolesets/{roleSetId}" }),
+    editRole: E("PATCH", { p: "/groups/v1/groups/{groupId}/rolesets/{roleSetId}" }),
+    games: E("GET"),
+    get: E("GET", { p: "/groups/v1/groups/{groupId}" }),
+    join: E("POST", { p: "/groups/v1/groups/{groupId}/users" }),
+    leave: E("DELETE", { p: "/groups/v1/groups/{groupId}/users/{userId}" }),
+    members: E("GET", { p: "/groups/v1/groups/{groupId}/users" }),
+    payout: E("POST", { p: "/groups/v1/groups/{groupId}/payouts" }),
+    postWall: E("POST", { p: "/groups/v1/groups/{groupId}/wall/posts" }),
+    removeMember: E("DELETE", { p: "/groups/v1/groups/{groupId}/users/{userId}" }),
+    roles: E("GET", { p: "/groups/v1/groups/{groupId}/roles" }),
+    search: E("GET", { p: "/groups/v1/groups/search" }),
+    setMemberRole: E("PATCH", { p: "/groups/v1/groups/{groupId}/users/{userId}" }),
+    setPrimary: E("POST", { p: "/groups/v1/user/groups/primary" }),
+    updateIcon: E("PATCH", { p: "/groups/v1/groups/icon" }),
+    updateSettings: E("PATCH", { p: "/groups/v1/groups/{groupId}/settings" }),
+    wall: E("GET")
   });
 })();
