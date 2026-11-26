@@ -48,7 +48,8 @@ export const promise = permissionsPromise;
 export default store as Readable<IRankResponse>
 
 export const get = () => {
-	return getStore(store).rank.name;
+	const data = getStore(store);
+	return data && data.rank ? data.rank.name : null;
 }
 
 type RankTypes = 'Admin' | 'Moderator' | 'Owner' | 'Mod' | 'admin' | 'moderator' | 'owner' | 'mod';
