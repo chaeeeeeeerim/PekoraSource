@@ -129,8 +129,10 @@ internal static class RccSoapRenderer
     {
         if (string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase))
             return true;
-        if (!IPAddress.TryParse(host, out var ip) || IPAddress.IsLoopback(ip))
-            return IPAddress.TryParse(host, out ip) && IPAddress.IsLoopback(ip);
+        if (!IPAddress.TryParse(host, out var ip))
+            return false;
+        if (IPAddress.IsLoopback(ip))
+            return true;
 
         var bytes = ip.GetAddressBytes();
         if (ip.AddressFamily == AddressFamily.InterNetwork)
