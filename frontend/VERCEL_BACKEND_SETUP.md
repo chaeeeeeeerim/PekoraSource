@@ -20,7 +20,7 @@ Keep PostgreSQL, Redis, asset storage, and the asset-validation service configur
 
 Catalog thumbnail requests for Hat, Mesh, MeshPart, Model, Image, Head and Emote now call the bundled RCCService 2020 SOAP client directly. Configure `RCC_SOAP_ENDPOINT` to a private/VPN/loopback SOAP endpoint, `RCC_SOAP_NAMESPACE` if your RCC build uses a non-default namespace, and `RCC_SOAP_SCRIPTS_DIRECTORY` when the bundled thumbnail scripts are outside the repository's default path. Head rendering also requires `RCC_HEAD_MANNEQUIN_ID`. The client rejects public RCC SOAP hosts and submits only bundled Lua scripts. Other render types still require a separate JSON adapter via `RENDERING_SERVICE_BASE_URL` and optional `RENDERING_SERVICE_TOKEN`. Do not expose the raw RCCService port publicly.
 
-The repository contains RCCService 2020 binaries/content, but this change does not claim the service is running: Windows runtime, licensed assets, storage, and a tested job adapter must be deployed separately.
+The repository contains RCCService 2020 binaries/content and the SOAP client integration. Live rendering is still unverified until the compatible Windows runtime, licensed assets, persistent asset storage, and private SOAP endpoint are configured and exercised.
 
 ## Quick signup
 
