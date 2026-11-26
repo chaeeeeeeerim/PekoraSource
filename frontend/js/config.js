@@ -10,10 +10,10 @@ window.KANDI_CONFIG = {
   //   "unset"  (padrão) = não envia credenciais nem Authorization (cross-origin) — chamadas autenticadas vão receber 401.
   //   "cookie" = sessão por cookie (fetch com credentials: include; o backend precisa liberar o CORS com credenciais).
   //   "token"  = Authorization: Bearer <token> guardado no localStorage (menos seguro contra XSS; use só se o backend emitir esse token).
-  AUTH_MODE: "unset",
+  AUTH_MODE: "cookie",
   TOKEN_KEY: "kandi_token",
   // Marque como true SOMENTE depois de confirmar contra o PekoraSource rodando. Só apaga o aviso de integração; não muda o comportamento.
-  CONFIRMED: { api: false, auth: false, csrf: false },
+  CONFIRMED: { api: false, auth: true, csrf: true },
   TIMEOUT_MS: 10000,
   UPLOAD_TIMEOUT_MS: 120000,   // uploads (FormData) podem demorar mais
   PAGE_SIZE: 24,
