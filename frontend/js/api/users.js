@@ -1,20 +1,22 @@
-// API "users" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi users methods connected only to verified Pekora routes.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("users", {
-  badges: E("GET"),
-  collectibles: E("GET"),
-  creations: E("GET"),
-  favorites: E("GET"),
-  friends: E("GET"),
-  get: E("GET"),
-  groups: E("GET"),
-  inventory: E("GET"),
-  search: E("GET"),
-  usernameHistory: E("GET")
+    badges: E("GET", { p: "/badges/v1/users/{userId}/badges" }),
+    collectibles: E("GET", { p: "/inventory/v1/users/{userId}/assets/collectibles" }),
+    creations: E("GET"),
+    favorites: E("GET"),
+    friends: E("GET", { p: "/friends/v1/users/{userId}/friends" }),
+    get: E("GET", {
+      p: "/users/v1/users/{userId}",
+      adapt: function (r) {
+        if (!r) return r;
+        return Object.assign({}, r, { username: r.username || r.name });
+      }
+    }),
+    groups: E("GET", { p: "/groups/v1/users/{userId}/groups/roles" }),
+    inventory: E("GET", { p: "/inventory/v1/users/{userId}/assets/collectibles" }),
+    search: E("POST", { p: "/users/v1/usernames/users" }),
+    usernameHistory: E("GET", { p: "/users/v1/users/{userId}/username-history" })
   });
 })();
