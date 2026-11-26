@@ -21,6 +21,7 @@ public class UsersControllerV1 : ControllerBase
     public long totalRap { get; set; }
 
     [HttpGet("users/authenticated")]
+    [HttpGet("/kandi/v1/session")]
     [SwaggerOperation(
         Tags = new[] { "Authentication", "Users" },
         Summary = "Gets the current authenticated user's session details.",
@@ -33,6 +34,7 @@ public class UsersControllerV1 : ControllerBase
         {
             id = userSession.userId,
             name = userSession.username,
+            username = userSession.username,
             displayName = userSession.username,
             isStaff = await StaffFilter.IsStaff(userSession.userId)
         };
