@@ -16,22 +16,10 @@ public class StaffFilter : ActionFilterAttribute, IAsyncActionFilter
         Console.WriteLine("[info] owner = {0}",ownerUserId);
     }
 
-    public static async Task<IEnumerable<long>> GetStaff()
+    public static Task<IEnumerable<long>> GetStaff()
     {
-        using var us = ServiceProvider.GetOrCreate<UsersService>();
-        var allStaff = await us.GetAllStaff();
-        var list = new List<long>();
-        foreach (var staff in allStaff)
-        {
-            list.Add(staff.userId);
-        }
-        
-        foreach (var owner in ownerUserId)
-        {
-            list.Add(owner);
-        }
-
-        return list;
+        // Kandi admin access is intentionally restricted to the two bootstrap owner accounts.
+        return Task.FromResult<IEnumerable<long>>(ownerUserId.ToArray());
     }
 
     public static bool IsOwner(long userId)
@@ -39,9 +27,10 @@ public class StaffFilter : ActionFilterAttribute, IAsyncActionFilter
         return ownerUserId.Contains(userId);
     }
     
-    public static async Task<bool> IsStaff(long userId)
+    public static Task<bool> IsStaff(long userId)
     {
-        return IsOwner(userId) || (await GetPermissions(userId)).Any();
+        // Staff permissions must never grant access to the Kandi admin panel.
+        return Task.FromResult(IsOwner(userId));
     }
 
     public static async Task<IEnumerable<Access>> GetPermissions(long userId)
@@ -88,22 +77,13 @@ public class StaffFilter : ActionFilterAttribute, IAsyncActionFilter
             return;
         }
 
-        if (ownerUserId.Contains(userInfo.userId))
-        {
-            await next();
-            return;
-        }
-
-        using var us = ServiceProvider.GetOrCreate<UsersService>();
-        var permissions = await us.GetStaffPermissions(userInfo.userId);
-
-        var hasRequiredPermission = permissions.Select(c => c.permission).Contains(permission);
-        if (!hasRequiredPermission)
+        if (!IsOwner(userInfo.userId))
         {
             await OnFail(context.HttpContext);
             return;
         }
-        Console.WriteLine("[info] admin authorized user {0} for {1}", userInfo.userId, permission);
+
+        Console.WriteLine("[info] Kandi owner {0} authorized for {1}", userInfo.userId, permission);
         await next();
     }
 }
