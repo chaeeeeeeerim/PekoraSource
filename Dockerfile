@@ -10,6 +10,8 @@ WORKDIR /app
 ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=build /app/publish ./
+# Serve the Kandi frontend from the same ASP.NET Core origin as the Pekora API.
+COPY --from=build /src/frontend ./wwwroot
 COPY --from=build /src/api/public ./api/public
 COPY --from=build /src/admin/public ./admin/public
 COPY --from=build /src/Roblox/Roblox.Libraries/Templates ./Roblox/Roblox.Libraries/Templates
