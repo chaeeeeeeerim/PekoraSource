@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/v1/:path*", "destination": "/api/proxy?path=/v1/:path*" },
+    { "source": "/admin-api/:path*", "destination": "/api/proxy?path=/admin-api/:path*" },
+    { "source": "/admin", "destination": "/api/proxy?path=/admin" },
+    { "source": "/admin/:path*", "destination": "/api/proxy?path=/admin/:path*" },
+    { "source": "/asset", "destination": "/api/proxy?path=/asset" },
+    { "source": "/asset/:path*", "destination": "/api/proxy?path=/asset/:path*" },
+    { "source": "/apisite/:path*", "destination": "/api/proxy?path=/apisite/:path*" },
+    { "source": "/auth/:path*", "destination": "/api/proxy?path=/auth/:path*" },
+    { "source": "/api/:path*", "destination": "/api/proxy?path=/api/:path*" },
+    { "source": "/users/:path*", "destination": "/api/proxy?path=/users/:path*" },
+    { "source": "/groups/:path*", "destination": "/api/proxy?path=/groups/:path*" },
+    { "source": "/games/:path*", "destination": "/api/proxy?path=/games/:path*" },
+    { "source": "/catalog/:path*", "destination": "/api/proxy?path=/catalog/:path*" },
+    { "source": "/develop/:path*", "destination": "/api/proxy?path=/develop/:path*" },
+    { "source": "/game/:path*", "destination": "/api/proxy?path=/game/:path*" },
+    { "source": "/thumbs/:path*", "destination": "/api/proxy?path=/thumbs/:path*" },
+    { "source": "/health", "destination": "/api/proxy?path=/health" }
+  ]
+}
