@@ -15,5 +15,43 @@
       "destination": "/Admin/",
       "permanent": false
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/apisite/:path*",
+      "destination": "/api/proxy?path=/apisite/:path*"
+    },
+    {
+      "source": "/admin-api/:path*",
+      "destination": "/api/proxy?path=/admin-api/:path*"
+    },
+    {
+      "source": "/asset",
+      "destination": "/api/proxy?path=/asset"
+    },
+    {
+      "source": "/asset/:path*",
+      "destination": "/api/proxy?path=/asset/:path*"
+    },
+    {
+      "source": "/v1/:path*",
+      "destination": "/api/proxy?path=/v1/:path*"
+    },
+    {
+      "source": "/thumbs/:path*",
+      "destination": "/api/proxy?path=/thumbs/:path*"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "/api/proxy?path=/auth/:path*"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/proxy?path=/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/proxy?path=/health"
+    }
   ]
 }
