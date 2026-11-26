@@ -1254,16 +1254,26 @@ public class UsersService : ServiceBase, IService
             await InsertAsync("user_economy", "user_id", new
             {
                 user_id = userId,
-                balance_tickets = 0,
+                balance_tickets = 100,
                 balance_robux = 100,
             });
 
-            // First transaction
+            // Initial KANBUX grant (Robux currency in the legacy Pekora schema).
             await InsertAsync("user_transaction", new
             {
                 amount = 100,
                 type = PurchaseType.BuildersClubStipend,
-                currency_type = 1,
+                currency_type = (int)CurrencyType.Robux,
+                user_id_one = userId,
+                user_id_two = 1,
+            });
+
+            // Initial TIX grant.
+            await InsertAsync("user_transaction", new
+            {
+                amount = 100,
+                type = PurchaseType.TicketsStipend,
+                currency_type = (int)CurrencyType.Tickets,
                 user_id_one = userId,
                 user_id_two = 1,
             });
