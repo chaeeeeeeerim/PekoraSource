@@ -59,6 +59,24 @@ public class AdminApiController : ControllerBase
     private DistributedCache redis => Roblox.Services.Cache.distributed;
     private static readonly long startTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
+    // External UGC may only be imported when its source asset ID has been explicitly approved
+    // for republication by its owner/licensor. An empty allowlist disables external imports.
+    private static bool IsUgcSourceAssetApproved(long assetId)
+    {
+        var configured = Environment.GetEnvironmentVariable("KANDI_UGC_ALLOWED_SOURCE_ASSET_IDS");
+        if (string.IsNullOrWhiteSpace(configured))
+            return false;
+
+        return configured.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Any(value => long.TryParse(value, out var allowedId) && allowedId == assetId);
+    }
+
+    private static void EnsureUgcSourceAssetApproved(long assetId)
+    {
+        if (!IsUgcSourceAssetApproved(assetId))
+            throw new StaffException("This source asset is not approved for import. Only assets owned by Kandi or explicitly licensed for republication can be imported.");
+    }
+
     private static string? adminBundleJs { get; set; }
     private static string? adminBundleCss { get; set; }
     private static string? adminBundleHtml { get; set; }
@@ -2140,6 +2158,7 @@ Thank you for your understanding,
     [HttpPost("asset/backport-from-roblox"), StaffFilter(Access.CreateAssetCopiedFromRoblox)]
     public async Task<dynamic> BackportAssetFromRoblox([Required, FromBody] CopyAssetRequest request)
     {
+        EnsureUgcSourceAssetApproved(request.assetId);
         var permissions = (await services.users.GetStaffPermissions(safeUserSession.userId)).Select(c => c.permission).ToArray();
         if (!request.force)
         {
@@ -2232,6 +2251,7 @@ Thank you for your understanding,
     [HttpPost("asset/copy-from-roblox"), StaffFilter(Access.CreateAssetCopiedFromRoblox)]
     public async Task<dynamic> CopyAssetFromRoblox([Required, FromBody] CopyAssetRequest request)
     {
+        EnsureUgcSourceAssetApproved(request.assetId);
         var permissions = (await services.users.GetStaffPermissions(safeUserSession.userId)).Select(c => c.permission).ToArray();
         if (!request.force)
         {
