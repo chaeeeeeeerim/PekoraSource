@@ -25,18 +25,16 @@ A path being mapped does not guarantee the Kandi request/response DTO is identic
 
 ## Still not implemented / not production-ready
 
-- JSON login/signup and application/Discord verification methods: the backend's JSON login/signup actions are commented out. Session lookup and logout are connected, but this is not a complete auth flow.
+- JSON username/password login and signup are now exposed at `/apisite/auth/v2/login` and `/apisite/auth/v2/signup`. They create the existing Pekora session cookie, validate username/password, and apply per-IP cooldowns. The Discord application/verification flow remains separate and is not required by this quick-login path.
 - Referral, feed, reports, site aggregation, and several library/account methods: no compatible backend route was confirmed.
 - Promocode redemption: the route exists but its current implementation always returns a fixed invalid-code response.
 - Notifications: the current route returns placeholder data; persistence and mark-read semantics are not complete.
 - Several Kandi methods in catalog, develop, groups, avatar, and economy still need request/response adapters or matching server handlers.
-- Full API module coverage is not complete; do not describe all 191 Kandi methods as integrated.
+- Full API module coverage is not complete; do not describe all 191 Kandi methods as integrated. Methods without verified Pekora contracts remain intentionally disconnected.
 
 ## Rendering
 
-The hardcoded third-party renderer IP has been removed. `Roblox.Rendering.RenderingHandler` now uses `RENDERING_SERVICE_BASE_URL` and optional `RENDERING_SERVICE_TOKEN`, validates HTTP(S) configuration, applies a timeout, checks HTTP status, and rejects empty/unsuccessful render responses.
-
-This renderer interface is a JSON adapter contract. The repository's RCCService 2020 executable uses a different native job protocol. A separately deployed, tested adapter must translate the existing JSON render routes into RCCService 2020 jobs. The Windows RCCService binary cannot run inside the Linux Vercel Function proxy. Run RCCService on compatible Windows infrastructure and keep its port private.
+The hardcoded third-party renderer IP has been removed. Catalog thumbnail types supported by the bundled RCCService 2020 scripts now use a native SOAP job client (`RccSoapRenderer`) with fixed repository-owned scripts, job cleanup, base64 validation, and a private-address-only SOAP endpoint. Other render types still use the separately configured JSON adapter (`RENDERING_SERVICE_BASE_URL` / `RENDERING_SERVICE_TOKEN`) and are not claimed as RCC-backed. RCCService must run on compatible Windows infrastructure; never expose its SOAP port publicly.
 
 ## Deployment
 
