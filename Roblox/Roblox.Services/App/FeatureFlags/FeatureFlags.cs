@@ -65,11 +65,16 @@ public static class FeatureFlags
     private static bool ApplicationsMustStayDisabled =>
         !string.Equals(Environment.GetEnvironmentVariable("KANDI_DISABLE_APPLICATIONS"), "false", StringComparison.OrdinalIgnoreCase);
 
+    private static bool QuickSignupMustStayEnabled =>
+        !string.Equals(Environment.GetEnvironmentVariable("KANDI_DISABLE_SIGNUP"), "true", StringComparison.OrdinalIgnoreCase);
+
     private static void ApplyKandiOverrides()
     {
         featureFlags ??= new Dictionary<FeatureFlag, bool>();
         if (ApplicationsMustStayDisabled)
             featureFlags[FeatureFlag.ApplicationsEnabled] = false;
+        if (QuickSignupMustStayEnabled)
+            featureFlags[FeatureFlag.SignupEnabled] = true;
     }
 
     public static void StartUpdateFlagTask()
