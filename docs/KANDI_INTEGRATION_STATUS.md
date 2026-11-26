@@ -44,4 +44,4 @@ See [VERCEL_BACKEND_SETUP.md](../frontend/VERCEL_BACKEND_SETUP.md). The Vercel p
 
 The GitHub Actions workflow now targets .NET 8, builds `Roblox/Roblox.sln`, runs unit tests, and runs the database-backed integration suite through Docker Compose. The integration test container was upgraded from .NET 6 to .NET 8, and its missing isolated Knex/PostgreSQL test config was added.
 
-No workflow run has been reported by GitHub for the current `main` commit yet, and this environment has no local `dotnet` SDK. Therefore the build and test results remain **unverified** until Actions executes successfully.
+The .NET workflow now also runs `Roblox.Rendering.Test`, including checks for the RCC renderer's supported types and private-endpoint restriction. The repository connector has not returned a .NET Actions run for the current `main` commit, and this environment has no local `dotnet` SDK. Therefore build/test success remains **unverified**. The Vercel status check currently reports a build-rate-limit failure; that is a Vercel quota issue, not a .NET test result.
