@@ -1,7 +1,7 @@
 // Project Kandi - configuração central. É o único arquivo que você precisa editar para ligar o backend.
 // Nada aqui está confirmado contra o PekoraSource: os campos marcados "NÃO VERIFICADO" devem ser conferidos na integração real.
 window.KANDI_CONFIG = {
-  TEST_MODE: true,         // true = MODO TESTE: nada é real, tudo é simulação local (dados "Teste", ações simuladas, sem rede). false = usa a API abaixo (backend real).
+  TEST_MODE: false,         // true = MODO TESTE: nada é real, tudo é simulação local (dados "Teste", ações simuladas, sem rede). false = usa a API abaixo (backend real).
   USE_STUB: false,         // só com DEMO:false. true = usa a API de teste local do server.py (--mock-api) para os métodos legados. NUNCA é o PekoraSource.
   API_BASE: "/api",        // NÃO VERIFICADO. Ex.: "https://api.seudominio.com". Com o server.py --mock-api use "/api".
   SERVICES: { default: "" },   // URL base por serviço (vazio = usa API_BASE). Ex.: { default: "https://api.seudominio.com", avatar: "https://avatar.seudominio.com" }. Preencher após ler o Program.cs do backend.
