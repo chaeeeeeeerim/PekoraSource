@@ -147,6 +147,21 @@ namespace Roblox.Rendering
                     url = "catalog/animation";
                     break;
             }
+            // RCCService 2020 catalog thumbnails are executed through its private SOAP job endpoint.
+            // The adapter accepts only repository-owned scripts and never caller-provided Lua.
+            var rccType = type.ToString();
+            if (RccSoapRenderer.Supports(rccType))
+            {
+                var publicBase = Roblox.Configuration.BaseUrl
+                    ?? throw new InvalidOperationException("BaseUrl is not configured for RCCService rendering.");
+                var width = x is > 0 ? x.Value : 420;
+                var height = y is > 0 ? y.Value : 420;
+                var image = await RccSoapRenderer.RenderAsync(rccType, id, publicBase, width, height);
+                sw.Stop();
+                Console.WriteLine($"[RenderingHandler] RCCService 2020 {rccType} render took {sw.ElapsedMilliseconds}ms");
+                return image;
+            }
+
             if (rendererBaseUri is null)
                 throw new InvalidOperationException("Rendering is not configured. Set RENDERING_SERVICE_BASE_URL to the RCC 2020 adapter URL.");
 
