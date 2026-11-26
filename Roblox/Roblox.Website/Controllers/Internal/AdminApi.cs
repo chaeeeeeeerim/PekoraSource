@@ -1861,76 +1861,19 @@ Thank you for your understanding,
     [HttpPost("lottery/run"), StaffFilter(Access.RunLottery)]
     public async Task<dynamic> RunLottery()
     {
-        var log = Writer.CreateWithId(LogGroup.Lottery);
-        log.Info("Lottery start. Initiated by {0}", userSession.userId);
-// #if !DEBUG
-//         var runDate = await redis.StringGetAsync("lottery_run_v1");
-//         if (runDate != null)
-//         {
-//             throw new StaffException("Lottery already ran recently. Try again later.");
-//         }
-// #endif
-
-        var allItems = (await GetLotteryItems()).ToList();
-        log.Info("There are {0} items available",allItems.Count);
-        if (allItems.Count == 0)
-            throw new StaffException("There are no items available for lottery");
-        var allUsers = (await GetEligibleLotteryUsers()).ToList();
-        log.Info("There are {0} users available",allUsers.Count);
-#if !DEBUG
-        if (allUsers.Count < 10)
-            throw new StaffException("At least 10 users have to be online to run the lottery");
-#endif
-        var randomItem = allItems[new Random().Next(0, allItems.Count)];
-        log.Info("Picked item. UAID = {0} Old Owner = {1}", randomItem.userAssetId, randomItem.userId);
-        var randomUser = allUsers[new Random().Next(0, allUsers.Count)];
-        log.Info("Picked user. ID = {0}", randomUser.userId);
-        // transfer item...
-        await db.ExecuteAsync("UPDATE user_asset SET user_id = :user_id, updated_at = now(), price = 0 WHERE id = :id", new
-        {
-            user_id = randomUser.userId,
-            id = randomItem.userAssetId,
-        });
-        log.Info("item {0} transferred from {1} to {2}", randomItem.userAssetId, randomItem.userId, randomUser.userId);
-        // send messages
-        await services.privateMessages.CreateMessage(randomUser.userId, 1, "You Won The Lottery!",
-            "Congrats! Your account was chosen as the winner for today's lottery, where a Limited or Limited Unique item is given away after the owner has been offline for 6 months or more.\n\nThe item you won is: " +
-            randomItem.name + ", which has a Recent Average Price of " + randomItem.recentAveragePrice + ". The item has already been added to your account - no action is required to claim it.\nIf you do not want this item, you can sell it on the market or trade it with another user for an item you do want.\n\n-The Roblox team");
-        log.Info("sent message to user picked {0}", randomUser.userId);
-        await services.privateMessages.CreateMessage(randomItem.userId, 1, "Inactive Account Penalty",
-            "Hello\n\nAs part of our efforts to encourage activity and discourage account compromises, we have removed the item " +
-            randomItem.name +
-            " from your inventory, and awarded it to a random player who was active at the time of our lottery draw. We understand that you may not have been expecting this to happen, however, it is outlined in our policy that we reserve the right to remove items from accounts once they've been inactive for 6 months or longer. At the time of sending this message, your account has been inactive since " + randomUser.onlineAt.ToString("MMMM dd, yyyy") + "\n\nItems taken from your account for lottery purposes cannot be restored. We hope you understand,\n\n-The Roblox Team");
-        log.Info("sent message to old asset owner {0}", randomItem.userId);
-        // await redis.StringSetAsync("lottery_run_v1", "{}", TimeSpan.FromMinutes(30));
-        return new
-        {
-            randomItem.name, randomUser.username,
-        };
+        throw new StaffException("This feature is disabled.");
     }
 
     [HttpGet("lottery/get-users-eligible"), StaffFilter(Access.GetStats)]
     public async Task<IEnumerable<UserLotteryEntry>> GetEligibleLotteryUsers()
     {
-        var eligibleUsers = await db.QueryAsync<UserLotteryEntry>(
-            "SELECT u.username, u.id as userId, u.online_at as onlineAt FROM \"user\" u WHERE u.online_at >= :online_time AND u.created_at <= :creation_time AND u.status = :status", new
-            {
-                status = AccountStatus.Ok,
-                online_time = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(10)),
-                creation_time = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30)), // at least 30 days old account
-            });
-        return eligibleUsers;
+        throw new StaffException("This feature is disabled.");
     }
 
     [HttpGet("lottery/get-items"), StaffFilter(Access.GetStats)]
     public async Task<IEnumerable<LotteryItemEntry>> GetLotteryItems()
     {
-        var eligibleItems = await db.QueryAsync<LotteryItemEntry>("SELECT a.name, a.id as assetId, a.recent_average_price as recentAveragePrice, u.id as userId, u.online_at as onlineAt, u.username, ua.id as userAssetId FROM user_asset ua INNER JOIN \"user\" u on u.id = ua.user_id INNER JOIN \"asset\" a ON a.id = ua.asset_id WHERE u.id != 1 AND u.id != 12 AND u.online_at <= :time AND (a.is_limited OR a.is_limited_unique) AND NOT a.is_for_sale AND u.status = :status ORDER BY u.online_at LIMIT 1000", new
-        {
-            status = AccountStatus.Ok,
-            time = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30 * 1)), // currently from 1 month
-        });
-        return eligibleItems;
+        throw new StaffException("This feature is disabled.");
     }
 
 
