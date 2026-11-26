@@ -21,7 +21,7 @@ window.KANDI_CONFIG = {
   LANDING_URL: "index.html",   // tela de login/cadastro (para onde o Log Out e o 401 voltam)
   DISCORD_INVITE: "#",         // link do convite do servidor Discord (rodapé). "#" = ainda não configurado (o link aparece desativado)
   DISCORD_URL: "/discordverify",   // NÃO VERIFICADO: URL do backend que inicia a verificação (OAuth feito pelo servidor; nenhum segredo no navegador)
-  REQUIRE_DISCORD: true,       // exige verificação do Discord no cadastro (modo real). A decisão final é SEMPRE do servidor.
+  REQUIRE_DISCORD: false,       // exige verificação do Discord no cadastro (modo real). A decisão final é SEMPRE do servidor.
   BANNER: "Found a bug on Project Kandi? Then click on this message to report it and get rewards!",
   BUG_URL: "#",                // "#" = ainda não configurado (o banner aparece sem link)
   DOWNLOADS: { main: "#", windows: "#", studio: "#", ios: "#", android: "#", mac: "#", linux: "#" },   // "#" = ainda não configurado (botão desativado)
