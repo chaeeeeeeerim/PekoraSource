@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Roblox.Libraries.Captcha;
+using Roblox.Models.Assets;
 using Roblox.Models.Economy;
 using Roblox.Models.Users;
 using Roblox.Website.Middleware;
@@ -54,7 +55,7 @@ public sealed class KandiAuthController : ControllerBase
 
         var created = await services.users.CreateUser(request.Username, request.Password, Gender.Unknown);
         // CreateUser initializes 100 Robux (KANBUX). Kandi's starter grant adds 100 Tickets.
-        await services.economy.IncrementCurrency(created.userId, CurrencyType.Tickets, 100);
+        await services.economy.IncrementCurrency(CreatorType.User, created.userId, CurrencyType.Tickets, 100);
 
         var sessionId = await services.users.CreateSession(created.userId);
         var cookie = SessionMiddleware.CreateJwt(new JwtEntry
