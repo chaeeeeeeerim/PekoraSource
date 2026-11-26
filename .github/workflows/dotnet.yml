@@ -24,6 +24,7 @@ jobs:
         run: |
           dotnet test Roblox/Roblox.UnitTest/Roblox.UnitTest.csproj --no-build --configuration Release
           dotnet test Roblox/Roblox.Libraries.UnitTest/Roblox.Libraries.UnitTest.csproj --no-build --configuration Release
+          dotnet test Roblox/Roblox.Rendering.Test/Roblox.Rendering.Test.csproj --no-build --configuration Release
       - name: Run database-backed integration tests
         run: |
           docker compose -f Roblox/Roblox.IntegrationTest/docker-compose.yml build
