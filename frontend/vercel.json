@@ -9,6 +9,14 @@
       "destination": "/kandi-signup.html"
     },
     {
+      "source": "/apisite/v1/login",
+      "destination": "/api/backend/v1/login"
+    },
+    {
+      "source": "/apisite/kandi/v1/auth/:path*",
+      "destination": "/api/backend/kandi/v1/auth/:path*"
+    },
+    {
       "source": "/v1/:path*",
       "destination": "/api/backend/v1/:path*"
     },

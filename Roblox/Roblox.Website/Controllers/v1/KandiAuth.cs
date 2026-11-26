@@ -37,7 +37,7 @@ public sealed class KandiAuthController : ControllerBase
             return StatusCode(503, new { message = "Quick signup is disabled on this server." });
 
         var rawIp = GetRequesterIpRaw(HttpContext);
-        var ipKey = GetIP(rawIp);
+        var ipKey = ControllerBase.GetIP(rawIp);
         if (!await services.cooldown.TryCooldownCheck("KandiQuickSignupV1:" + ipKey, TimeSpan.FromSeconds(5)))
             return StatusCode(429, new { message = "Too many signup attempts. Wait a few seconds." });
         if (!await services.cooldown.TryIncrementBucketCooldown("KandiQuickSignupCountV1:" + ipKey, 5, TimeSpan.FromHours(1)))
