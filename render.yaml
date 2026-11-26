@@ -89,6 +89,8 @@ services:
         value: "-1"
       - key: OwnerUserId__0
         value: "1"
+      - key: OwnerUserId__1
+        value: "2"
       - key: SignupAssetIds__0
         value: "0"
       - key: SignupAvatarAssetIds__0

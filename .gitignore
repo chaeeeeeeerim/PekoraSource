@@ -78,3 +78,10 @@ game-renderer/eslint.config.js.old
 /game-renderer/.idea
 /frontend/.next
 /frontend/.idea
+# Runtime database files: keep credentials and account data out of GitHub.
+/database/*.db
+/database/*.db-*
+/database/*.sqlite
+/database/*.sqlite3
+/database/*.sqlite-*
+!/database/.gitkeep

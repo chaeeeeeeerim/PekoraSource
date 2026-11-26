@@ -37,6 +37,7 @@ using Roblox.Models.Users;
 using Roblox.Services.App.FeatureFlags;
 using Roblox.Services.Exceptions;
 using Roblox.Website.Filters;
+using Roblox.Website.Middleware;
 using Roblox.Website.WebsiteModels.Asset;
 using ServiceProvider = Roblox.Services.ServiceProvider;
 using Exception = System.Exception;
@@ -48,8 +49,35 @@ using Roblox.Services;
 
 namespace Roblox.Website.Controllers;
 
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public sealed class AdminUidAllowlistAttribute : ActionFilterAttribute
+{
+    private static readonly HashSet<long> AllowedUserIds = new() { 1L, 2L };
+
+    public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        var session = context.HttpContext.Items[SessionMiddleware.CookieName] as UserSession;
+        if (session == null)
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.HttpContext.Response.WriteAsJsonAsync(new { errors = new[] { new { message = "Authentication required", code = 0 } } });
+            return;
+        }
+
+        if (!AllowedUserIds.Contains(session.userId))
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.HttpContext.Response.WriteAsJsonAsync(new { errors = new[] { new { message = "Admin access is restricted to UID 1 and UID 2", code = 0 } } });
+            return;
+        }
+
+        await next();
+    }
+}
+
 [ApiController]
 [Route("/admin-api/api/")]
+[AdminUidAllowlist]
 #if RELEASE
 [ApiExplorerSettings(IgnoreApi = true)]
 #endif

@@ -19,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Render injects configuration through environment variables. ASP.NET Core maps
 // double underscores (__) to nested configuration keys.
 IConfiguration configuration = builder.Configuration;
+Roblox.Configuration.RequireUserApplication = configuration.GetValue<bool>("RequireUserApplication", false);
 
 // DB
 Roblox.Services.Database.Configure(configuration.GetSection("Postgres").Value!);
@@ -122,6 +123,9 @@ builder.Services.AddMvc(c =>
 
 var app = builder.Build();
 app.UseRouting();
+// Kandi is the primary website and is served by the same ASP.NET Core host as the API.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseSwaggerUI(c =>
 {
     c.ShowCommonExtensions();

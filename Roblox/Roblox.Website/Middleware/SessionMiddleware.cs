@@ -131,7 +131,7 @@ public class SessionMiddleware
                     }
                     // Check if user filled out new app
                     var appStatus = await users.IsUserApproved(userInfo.userId);
-                    if (!appStatus && !userInfo.isAdmin && !userInfo.isModerator && !StaffFilter.IsOwner(userInfo.userId))
+                    if (Roblox.Configuration.RequireUserApplication && !appStatus && !userInfo.isAdmin && !userInfo.isModerator && !StaffFilter.IsOwner(userInfo.userId))
                     {
                         if (!currentPath.StartsWith("/auth/"))
                         {
