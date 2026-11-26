@@ -12,15 +12,35 @@ interface IRankResponse {
 	restrictions: Record<string, boolean>;
 }
 const lsKey = 'v.1_adm_rank_data';
-const store: Writable<IRankResponse> = writable(localStorage.getItem(lsKey) && JSON.parse(localStorage.getItem(lsKey)) || null);
+function readCachedRank(): IRankResponse | null {
+	try {
+		const raw = localStorage.getItem(lsKey);
+		if (!raw) return null;
+		const parsed = JSON.parse(raw);
+		return parsed && parsed.rank && parsed.rank.details ? parsed : null;
+	} catch {
+		try { localStorage.removeItem(lsKey); } catch {}
+		return null;
+	}
+}
+const store: Writable<IRankResponse | null> = writable(readCachedRank());
 store.subscribe(newRankData => {
-	localStorage.setItem(lsKey, JSON.stringify(newRankData));
+	try {
+		if (newRankData) localStorage.setItem(lsKey, JSON.stringify(newRankData));
+		else localStorage.removeItem(lsKey);
+	} catch {}
 });
 
 import request from '../lib/request';
 const permissionsPromise = request.get<IRankResponse>('/permissions').then(data => {
+	if (!data.data || !data.data.rank || !data.data.rank.details) {
+		throw new Error('The backend returned an invalid admin-permissions response.');
+	}
 	console.log('[info] current perms', data.data);
 	store.set(data.data);
+}).catch(error => {
+	store.set(null);
+	throw error;
 });
 
 export const promise = permissionsPromise;
