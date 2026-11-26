@@ -127,12 +127,34 @@ namespace Roblox.Rendering
                     url = "catalog/animation";
                     break;
             }
-            // i will add error handling to this later
+            // RCCService 2020 handles catalog thumbnails through its private SOAP endpoint.
+            // Only bundled, fixed Lua scripts are submitted by RccSoapRenderer.
+            var renderType = type.ToString();
+            if (RccSoapRenderer.Supports(renderType))
+            {
+                var baseUrl = Roblox.Configuration.BaseUrl
+                    ?? throw new InvalidOperationException("BaseUrl is not configured for RCC rendering.");
+                var width = x is > 0 ? x.Value : 420;
+                var height = y is > 0 ? y.Value : 420;
+                var result = await RccSoapRenderer.RenderAsync(renderType, id, baseUrl, width, height);
+                sw.Stop();
+                Console.WriteLine($"[RenderingHandler] RCCService 2020 {renderType} render took {sw.ElapsedMilliseconds}ms");
+                return result;
+            }
+
+            // Non-catalog render types may use a separately managed legacy renderer, but never a hard-coded third-party host.
+            var legacyRenderBase = Environment.GetEnvironmentVariable("KANDI_LEGACY_RENDER_API_URL");
+            if (!Uri.TryCreate(legacyRenderBase, UriKind.Absolute, out var legacyUri) ||
+                legacyUri.Scheme is not ("http" or "https"))
+                throw new InvalidOperationException(
+                    $"RCCService 2020 does not yet support {renderType}; configure KANDI_LEGACY_RENDER_API_URL for this legacy render type.");
+
             var content = new StringContent(JsonSerializer.Serialize(renderRequest), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("http://176.100.36.98:7832/" + url, content);
+            var targetUrl = new Uri(legacyUri.ToString().TrimEnd('/') + "/" + url);
+            HttpResponseMessage response = await client.PostAsync(targetUrl, content);
             sw.Stop();
             var request = await response.Content.ReadFromJsonAsync<RenderResponse>();
-            Console.WriteLine($"[RenderingHandler] Request took {sw.ElapsedMilliseconds}ms");
+            Console.WriteLine($"[RenderingHandler] Legacy {renderType} render took {sw.ElapsedMilliseconds}ms");
             return request?.data ?? "FAILURE";
         }
 
