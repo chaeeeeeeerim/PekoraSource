@@ -22,6 +22,10 @@ Catalog thumbnail requests for Hat, Mesh, MeshPart, Model, Image, Head and Emote
 
 The repository contains RCCService 2020 binaries/content, but this change does not claim the service is running: Windows runtime, licensed assets, storage, and a tested job adapter must be deployed separately.
 
+## Quick signup
+
+The Kandi signup page uses hCaptcha, matching the ASP.NET `HCaptcha.IsValid` validation. Set `KANDI_QUICK_SIGNUP_ENABLED=true` on the isolated test backend and configure `HCaptcha:Public` and `HCaptcha:Private` there. Signup is disabled by default.
+
 ## Validation
 
 The .NET workflow builds `Roblox/Roblox.sln` in Release and runs the solution's unit/integration test projects on pushes to `main`. Vercel proxy validation still requires a real `KANDI_BACKEND_URL` and a deployment environment.
