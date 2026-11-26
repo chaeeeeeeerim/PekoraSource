@@ -14,6 +14,7 @@ The proxy forwards session cookies and the CSRF token and preserves `Set-Cookie`
 
 ## Backend requirements
 
+- Keep the legacy application-based signup flow disabled. The backend now forces `ApplicationsEnabled=false` by default; set `KANDI_DISABLE_APPLICATIONS=false` only if you intentionally restore it. Quick Username/Password signup uses the separate `/v1/signup` route.
 - Serve the ASP.NET application over HTTPS.
 - Configure `BaseUrl` to the backend's public origin.
 - Keep PostgreSQL and Redis private.
