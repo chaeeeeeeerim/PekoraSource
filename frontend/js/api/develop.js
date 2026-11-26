@@ -1,38 +1,34 @@
-// API "develop" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi creator methods mapped only where a matching Pekora Develop v1 route exists.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("develop", {
-  badges: E("GET"),
-  createBadge: E("POST"),
-  createGame: E("POST"),
-  createPass: E("POST"),
-  createPlace: E("POST"),
-  createProduct: E("POST"),
-  gameThumbnails: E("GET"),
-  generateThumbnail: E("POST"),
-  getAsset: E("GET"),
-  getBadge: E("GET"),
-  getGame: E("GET"),
-  getPass: E("GET"),
-  getProduct: E("GET"),
-  mine: E("GET"),
-  moderation: E("GET"),
-  passes: E("GET"),
-  products: E("GET"),
-  updateAsset: E("PATCH"),
-  updateBadge: E("PATCH"),
-  updateGame: E("PATCH"),
-  updatePass: E("PATCH"),
-  updatePlace: E("POST"),
-  updateProduct: E("PATCH"),
-  uploadAsset: E("POST"),
-  uploadGameIcon: E("POST"),
-  uploadGameThumbnail: E("POST"),
-  uploadVersion: E("POST"),
-  versions: E("GET")
+    badges: E("GET", { p: "/badges/v1/universes/{universeId}/badges" }),
+    createBadge: E("POST"),
+    createGame: E("POST"),
+    createPass: E("POST"),
+    createPlace: E("POST"),
+    createProduct: E("POST", { p: "/develop/v1/universes/{universeId}/developerproducts" }),
+    gameThumbnails: E("GET"),
+    generateThumbnail: E("POST"),
+    getAsset: E("GET", { p: "/develop/v1/assets/{assetId}/latest-saved-version" }),
+    getBadge: E("GET", { p: "/badges/v1/badges/{badgeId}" }),
+    getGame: E("GET"),
+    getPass: E("GET"),
+    getProduct: E("GET"),
+    mine: E("GET", { p: "/develop/v1/assets" }),
+    moderation: E("GET"),
+    passes: E("GET"),
+    products: E("GET", { p: "/develop/v1/universes/{universeId}/developerproducts" }),
+    updateAsset: E("PATCH", { p: "/develop/v1/assets/{assetId}" }),
+    updateBadge: E("PATCH", { p: "/badges/v1/badges/{badgeId}" }),
+    updateGame: E("PATCH"),
+    updatePass: E("PATCH"),
+    updatePlace: E("POST"),
+    updateProduct: E("POST", { p: "/develop/v1/universes/{universeId}/developerproducts/{productId}/update" }),
+    uploadAsset: E("POST"),
+    uploadGameIcon: E("POST", { p: "/develop/v1/assets/upload-gameicon" }),
+    uploadGameThumbnail: E("POST", { p: "/develop/v1/assets/upload-thumbnail" }),
+    uploadVersion: E("POST"),
+    versions: E("GET", { p: "/develop/v1/assets/{assetId}/published-versions" })
   });
 })();
