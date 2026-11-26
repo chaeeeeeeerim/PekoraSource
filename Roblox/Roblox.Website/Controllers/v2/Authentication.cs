@@ -58,7 +58,7 @@ public class AuthenticationControllerV2 : ControllerBase
         await services.users.UpdatePassword(safeUserSession.userId, request.newPassword);
     }
 
-    [HttpPost("logout")]
+    [HttpPost("logout"), HttpPost("/api/auth/logout")]
     public async Task Logout()
     {
         await services.users.DeleteSession(safeUserSession.sessionId);
@@ -67,65 +67,89 @@ public class AuthenticationControllerV2 : ControllerBase
         HttpContext.Response.Cookies.Delete(Middleware.SessionMiddleware.CookieName);
     }
 
-    // [HttpPost("login")]
-    // public async Task Login([Required, FromBody] LoginRequest request)
-    // {
-    //     throw new RobloxException(503, 0, "Please use https://silrev.biz/auth/accountlogin");
-        // FeatureFlags.FeatureCheck(FeatureFlag.LoginEnabled);
-        // if (request.ctype != "username")
-        // {
-        //     throw new BadRequestException(0, "Login type is not supported.");
-        // }
+    private async Task CreateSessionAndSetCookie(long userId)
+    {
+        var sessionId = await services.users.CreateSession(userId);
+        var cookie = Middleware.SessionMiddleware.CreateJwt(new Middleware.JwtEntry
+        {
+            sessionId = sessionId,
+            createdAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+        });
+        Response.Cookies.Append(Middleware.SessionMiddleware.CookieName, cookie, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            IsEssential = true,
+            Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddDays(364),
+        });
+    }
 
-        // long userId;
-        // try
-        // {
-        //     userId = await services.users.GetUserIdFromUsername(request.cvalue);
-        // }
-        // catch (RecordNotFoundException)
-        // {
-        //     throw new ForbiddenException(1, "Incorrect username or password. Please try again");
-        // }
+    [HttpPost("login"), HttpPost("/api/auth/login")]
+    public async Task<IActionResult> Login([Required, FromBody] LoginRequest request)
+    {
+        var username = string.IsNullOrWhiteSpace(request.username) ? request.cvalue : request.username;
+        if (!string.IsNullOrWhiteSpace(request.ctype) && request.ctype != "username")
+            throw new BadRequestException(0, "Only username login is supported.");
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(request.password))
+            throw new BadRequestException(0, "Username and password are required.");
 
-        // var passwordOk = await services.users.VerifyPassword(userId, request.password);
-        // if (!passwordOk)
-        // {
-        //     throw new ForbiddenException(1, "Incorrect username or password. Please try again");
-        // }
+        long userId;
+        try
+        {
+            userId = await services.users.GetUserIdFromUsername(username.Trim());
+        }
+        catch (RecordNotFoundException)
+        {
+            throw new ForbiddenException(1, "Incorrect username or password. Please try again.");
+        }
 
-        // await CreateSessionAndSetCookie(userId);
-    //}
-    // will never be neabled
-    // [HttpPost("signup")]
-    // public void Signup([Required] SignUpRequest request)
-    // {
-    //     throw new RobloxException(503, 0, "Service temporarily unavailable");
-        // FeatureFlags.FeatureCheck(FeatureFlag.SignupEnabled);
-        // var usernameValid = await services.users.IsUsernameValid(request.username);
-        // if (!usernameValid)
-        //     throw new BadRequestException(5, "Invalid Username");
+        if (!await services.users.VerifyPassword(userId, request.password))
+            throw new ForbiddenException(1, "Incorrect username or password. Please try again.");
 
-        // var nameAvailable = await services.users.IsNameAvailableForSignup(request.username);
-        // if (!nameAvailable)
-        //     throw new ForbiddenException(6, "Username is already taken");
+        await CreateSessionAndSetCookie(userId);
+        var user = await services.users.GetUserById(userId);
+        return Ok(new { user = new { userId, username = user.username } });
+    }
 
-        // var passwordValid = services.users.IsPasswordValid(request.password);
-        // if (!passwordValid)
-        //     throw new ForbiddenException(9, "Password is too simple");
+    [HttpPost("signup"), HttpPost("/api/auth/signup")]
+    public async Task<IActionResult> Signup([Required, FromBody] SignUpRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.username) || string.IsNullOrWhiteSpace(request.password))
+            throw new BadRequestException(0, "Username and password are required.");
 
-        // // Initial cooldown check - to prevent people spamming attempts
-        // await services.cooldown.CooldownCheck($"signup:step1:" + GetIP(), TimeSpan.FromSeconds(5));
-        // // Now make the account
-        // var createdUser =
-        //     await services.users.CreateUser(request.username, request.password, Enum.Parse<Gender>(request.gender));
+        var signupKey = "kandi:quick-signup:" + GetIP();
+        if (!await services.cooldown.TryCooldownCheck(signupKey, TimeSpan.FromSeconds(10)))
+            throw new RobloxException(429, 0, "Too many signup attempts. Please wait a moment.");
 
-        // await CreateSessionAndSetCookie(createdUser.userId);
+        var username = request.username.Trim();
+        if (!await services.users.IsUsernameValid(username))
+            throw new BadRequestException(5, "Invalid username.");
+        if (!await services.users.IsNameAvailableForSignup(username))
+            throw new ForbiddenException(6, "Username is already taken.");
+        if (!services.users.IsPasswordValid(request.password))
+            throw new BadRequestException(9, "Password is too simple.");
 
-        // return new SignupResponse()
-        // {
-        //     userId = createdUser.userId,
-        // };
-    //}
+        var createdUser = await services.users.CreateUser(username, request.password, Gender.Unknown);
+        await CreateSessionAndSetCookie(createdUser.userId);
+        return Ok(new { user = new { userId = createdUser.userId, username } });
+    }
+
+    [HttpGet("me"), HttpGet("/api/auth/me")]
+    public async Task<dynamic> Me()
+    {
+        var session = safeUserSession;
+        var balance = await services.economy.GetUserBalance(session.userId);
+        return new
+        {
+            userId = session.userId,
+            username = session.username,
+            currency = balance.robux,
+            robux = balance.robux,
+            tickets = balance.tickets,
+        };
+    }
 
     [HttpPost("logoutfromallsessionsandreauthenticate")]
     public async Task LogoutFromAllSessionsAndReAuthenticate()
