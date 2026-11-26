@@ -24,3 +24,10 @@ jobs:
       run: dotnet restore Roblox\Roblox.sln
     - name: Build
       run: dotnet build Roblox\Roblox.sln --no-restore
+
+  container-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Vercel container (ASP.NET Core + Kandi + Admin)
+        run: docker build -f Dockerfile.vercel -t kandi-pekora-vercel .
