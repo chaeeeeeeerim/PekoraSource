@@ -49,7 +49,7 @@ export default store as Readable<IRankResponse>
 
 export const get = () => {
 	const data = getStore(store);
-	return data && data.rank ? data.rank.name : null;
+	return data && data.rank ? data.rank.name : "";
 }
 
 type RankTypes = 'Admin' | 'Moderator' | 'Owner' | 'Mod' | 'admin' | 'moderator' | 'owner' | 'mod';
