@@ -8,17 +8,18 @@
     applicationStatus: E("GET"),
     applyAccount: E("POST"),
     forgotPassword: E("POST"),
-    login: E("POST"),
-    logout: E("POST"),
+    login: E("POST", { p: "/v1/login" }),
+    logout: E("POST", { p: "/v1/logout" }),
     me: E("GET", {
-      p: "/users/authenticated",
+      p: "/v1/me",
       adapt: function (r) {
-        if (!r || r.id == null || !r.name) return r;
-        return { id: r.id, username: r.name, displayName: r.displayName || r.name, isStaff: r.isStaff };
+        var user = r && r.user ? r.user : r;
+        if (!user || user.id == null || !user.username) return user;
+        return { id: user.id, username: user.username, displayName: user.displayName || user.username, currency: user.currency, tickets: user.tickets };
       }
     }),
     resetPassword: E("POST"),
-    signup: E("POST"),
+    signup: E("POST", { p: "/v1/signup" }),
     twoFactorDisable: E("POST"),
     twoFactorEnable: E("POST"),
     twoFactorStatus: E("GET"),
