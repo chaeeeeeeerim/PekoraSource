@@ -1,13 +1,9 @@
-// API "chat" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi chat methods mapped to the verified Pekora Chat v2 routes.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("chat", {
-  conversations: E("GET"),
-  messages: E("GET"),
-  send: E("POST")
+    conversations: E("GET", { p: "/chat/v2/get-user-conversations" }),
+    messages: E("GET", { p: "/chat/v2/get-messages" }),
+    send: E("POST", { p: "/chat/v2/send-message" })
   });
 })();
