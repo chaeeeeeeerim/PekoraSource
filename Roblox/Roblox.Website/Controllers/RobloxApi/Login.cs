@@ -2,6 +2,8 @@ using MVC = Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Mvc;
 using Roblox.Services.Exceptions;
+using Roblox.AbuseDetection.Report;
+using Roblox.Models.Users;
 using Roblox.Website.WebsiteModels.Authentication;
 using System.Web;
 using Roblox.Dto.Users;
@@ -17,6 +19,45 @@ namespace Roblox.Website.Controllers
     [MVC.Route("/")]
     public class RobloxLogin: ControllerBase
     {
+        // Quick Kandi registration: Username + Password only; no Discord application or verification flow.
+        [HttpPostBypass("v1/signup")]
+        public async Task<dynamic> SignupV1([FromBody] LoginRequest request)
+        {
+            FeatureFlags.FeatureCheck(FeatureFlag.SignupEnabled);
+            await RateLimitCheck();
+
+            var username = request.username ?? request.cvalue;
+            var password = request.password;
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                throw new BadRequestException(0, "Username and password are required.");
+
+            var ip = GetIP();
+            if (!await services.cooldown.TryCooldownCheck("signup:quick:ip:" + ip, TimeSpan.FromSeconds(5)))
+                throw new BadRequestException(0, "Too many signup attempts. Try again shortly.");
+
+            if (!await services.users.IsUsernameValid(username))
+                throw new BadRequestException(0, "Invalid username.");
+            if (!await services.users.IsNameAvailableForSignup(username))
+                throw new BadRequestException(0, "Username is already taken.");
+            if (!services.users.IsPasswordValid(password))
+                throw new BadRequestException(0, "Password is too simple.");
+            if (!await UsersAbuse.ShouldAllowCreation(new (ip)))
+                throw new BadRequestException(0, "Registration is temporarily unavailable.");
+
+            var createdUser = await services.users.CreateUser(username, password, Gender.Unknown);
+            await CreateSessionAndSetCookie(createdUser.userId);
+
+            return new
+            {
+                user = new
+                {
+                    id = createdUser.userId,
+                    name = username,
+                    displayName = username,
+                },
+            };
+        }
+
         [HttpPostBypass("v1/login")]
         public async Task<dynamic> LoginV1([FromBody] LoginRequest request)
         {
