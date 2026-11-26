@@ -38,6 +38,11 @@ public class ApplicationGuardMiddleware
         "/auth/signup",
         "/auth/ticket",
         "/auth/application-check",
+        // Public Kandi JSON authentication endpoints.
+        "/apisite/auth/v2/login",
+        "/apisite/auth/v2/signup",
+        "/api/auth/login",
+        "/api/auth/signup",
         // razor public
         "/unsecuredcontent/",
         // gs
