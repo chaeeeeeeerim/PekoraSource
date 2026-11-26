@@ -33,7 +33,7 @@
   //   adapt   adapt(resposta, opções) -> formato que a UI espera (ver KandiAPI.adapters e PEKORA_BACKEND_INTEGRATION.md seção 3).
   //   raw     true = a resposta pode não ser JSON (ex.: Razor Page): o adapt recebe { status, ok, redirected, url, text, data } e DECIDE se é sucesso (lance ApiError se não for).
   //   timeout ms, para métodos lentos.
-  function E(m, o) { var d = { m: m, p: "", svc: "default", auth: true, csrf: true, adapt: null, raw: false, timeout: 0 }; for (var k in o || {}) d[k] = o[k]; return d; }
+  function E(m, o) { var d = { m: m, p: "", svc: "default", root: false, auth: true, csrf: true, adapt: null, raw: false, timeout: 0 }; for (var k in o || {}) d[k] = o[k]; return d; }
   function define(mod, defs) { Object.keys(defs).forEach(function (k) { DEFS[mod + "." + k] = defs[k]; }); }
 
   // ---------- adaptadores: converte o formato do backend para os contratos da UI SEM inventar valores ----------
@@ -159,7 +159,7 @@
       return data;
     }
   }
-  function baseFor(d) { var b = C.SERVICES && C.SERVICES[d.svc || "default"]; return (b || C.API_BASE || "").replace(/\/$/, ""); }
+  function baseFor(d) { if (d.root) return ""; var b = C.SERVICES && C.SERVICES[d.svc || "default"]; return (b || C.API_BASE || "").replace(/\/$/, ""); }
   // Para a API de teste local (USE_STUB): mapeia métodos legados para config.ENDPOINTS. Nunca preenche rotas do Pekora.
   var STUB = { "auth.login": "login", "auth.signup": "signup", "auth.logout": "logout", "auth.me": "me", "site.home": "home", "catalog.search": "catalog", "feed.post": "feedPost", "groups.mine": "groups", "economy.transactions": "transactions", "avatar.items": "avatar", "membership.tiers": "buildersClub" };
 
@@ -171,7 +171,7 @@
     if (C.DEMO) return demoCall(name, m, o);
     var p = d.p || (C.USE_STUB && STUB[name] ? C.ENDPOINTS[STUB[name]] : "");
     if (!p) throw new ApiError(501, "Not connected yet: " + name + " (edit js/api/" + name.split(".")[0] + ".js)", null, "unconnected");
-    var base = baseFor(d); if (!base && !/^https?:/.test(p)) throw new ApiError(0, "API_BASE is not configured (js/config.js).", null, "config");
+    var base = baseFor(d); if (!base && !d.root && !/^https?:/.test(p)) throw new ApiError(0, "API_BASE is not configured (js/config.js).", null, "config");
     var routeParams = typeof d.params === "function" ? d.params(o.params || {}, o) : (o.params || {});
     var path = p.replace(/\{(\w+)\}/g, function (_, k) { if (routeParams[k] == null) throw new ApiError(0, "Missing parameter: " + k, null, "config"); return encodeURIComponent(routeParams[k]); });
     var requestOptions = typeof d.prepare === "function" ? (d.prepare(o) || o) : o;
