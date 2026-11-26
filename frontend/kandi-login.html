@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Log In · Kandi</title><link rel="icon" href="assets/favicon-32.png"><style>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Log In · Kandi</title><link rel="icon" href="/assets/favicon-32.png"><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#24232a;color:#fff;font:15px/1.5 Arial,sans-serif;display:grid;place-items:center;padding:20px}.panel{width:min(100%,420px);background:#302d36;border:1px solid #514451;border-radius:14px;padding:26px;box-shadow:0 18px 50px #0005}h1{text-align:center;margin:0 0 8px}p{color:#d3cbd4}label{display:block;margin:14px 0 6px}input{width:100%;padding:12px;border-radius:7px;border:1px solid #777;background:#fff;color:#222;font:inherit}.btn{width:100%;border:0;border-radius:7px;background:#e65a9e;color:#fff;font-weight:700;padding:13px;margin-top:18px;font:inherit;cursor:pointer}.err{color:#ff9ebd;min-height:24px}.muted{text-align:center;font-size:13px}.muted a,a{color:#ff9ecb}.logo{display:block;width:74px;height:74px;object-fit:contain;margin:0 auto 12px}
-</style></head><body><main class="panel"><img class="logo" src="assets/k.png" alt="Kandi"><h1>Welcome back</h1><p class="muted">Sign in with your Kandi username and password.</p><form id="login"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required maxlength="20"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><label for="totp">Two-step code (if enabled)</label><input id="totp" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><p class="err" id="error" role="alert"></p><button class="btn" id="submit">Log In</button></form><p class="muted">New to Kandi? <a href="/kandi/signup">Create an account</a></p><p class="muted"><a href="/">Back to homepage</a></p></main>
-<script src="js/config.js"></script><script src="js/api.js"></script><script>
+</style></head><body><main class="panel"><img class="logo" src="/assets/k.png" alt="Kandi"><h1>Welcome back</h1><p class="muted">Sign in with your Kandi username and password.</p><form id="login"><label for="username">Username</label><input id="username" name="username" autocomplete="username" required maxlength="20"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required><label for="totp">Two-step code (if enabled)</label><input id="totp" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><p class="err" id="error" role="alert"></p><button class="btn" id="submit">Log In</button></form><p class="muted">New to Kandi? <a href="/kandi/signup">Create an account</a></p><p class="muted"><a href="/">Back to homepage</a></p></main>
+<script src="/js/config.js"></script><script src="/js/api.js"></script><script>
 (function(){
   var E=window.KandiAPI.E;
-  window.KandiAPI.define("quickAuth",{login:E("POST",{p:"/v1/login",auth:false})});
+  window.KandiAPI.define("quickAuth",{login:E("POST",{p:"/v1/login",auth:false,root:true})});
   var form=document.getElementById("login"),button=document.getElementById("submit"),error=document.getElementById("error");
   form.addEventListener("submit",async function(ev){
     ev.preventDefault(); error.textContent=""; button.disabled=true; button.textContent="Signing in…";
     var username=form.username.value.trim(), code=form.totp.value.trim();
     try{
       await window.KandiAPI.call("quickAuth.login",{body:{cvalue:username+(code?"|"+code:""),password:form.password.value}});
-      location.replace("app.html#home");
+      location.replace("/app.html#home");
     }catch(e){error.textContent=e.message||"Unable to sign in. Check your credentials and try again.";}
     finally{button.disabled=false;button.textContent="Log In";}
   });
