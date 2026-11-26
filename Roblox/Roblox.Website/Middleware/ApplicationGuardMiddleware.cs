@@ -38,11 +38,11 @@ public class ApplicationGuardMiddleware
         "/auth/signup",
         "/auth/ticket",
         "/auth/application-check",
+        // Kandi quick login and CAPTCHA-protected signup endpoints.
+        "/v1/login",
+        "/kandi/v1/auth/signup-config",
+        "/kandi/v1/auth/signup",
         // Public Kandi JSON authentication endpoints.
-        "/apisite/auth/v2/login",
-        "/apisite/auth/v2/signup",
-        "/api/auth/login",
-        "/api/auth/signup",
         // razor public
         "/unsecuredcontent/",
         // gs
