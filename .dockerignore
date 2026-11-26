@@ -10,7 +10,6 @@ deployment
 economy-chat
 
 # Not needed by the ASP.NET website container
-frontend
 game-renderer
 RCCService
 game-server/src
