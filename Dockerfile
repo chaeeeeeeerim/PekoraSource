@@ -22,6 +22,7 @@ COPY --from=build /app/publish ./
 COPY --from=build /src/frontend ./frontend
 COPY --from=build /src/api/public ./api/public
 COPY --from=admin-build /src/admin/public ./admin/public
+COPY --from=build /src/RCCService/RCCService2020/internalscripts/thumbnails ./RCCService/RCCService2020/internalscripts/thumbnails
 COPY --from=build /src/Roblox/Roblox.Libraries/Templates ./Roblox/Roblox.Libraries/Templates
 COPY --from=build /src/Roblox/Roblox.Libraries/Json ./Roblox/Roblox.Libraries/Json
 COPY --from=build /src/game-server/scripts ./game-server/scripts
