@@ -17,6 +17,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 ENV ASPNETCORE_ENVIRONMENT=Production
+ENV RequireUserApplication=false
 COPY --from=build /app/publish ./
 # Serve the Kandi frontend from the same ASP.NET Core origin as the Pekora API.
 COPY --from=build /src/frontend ./wwwroot
