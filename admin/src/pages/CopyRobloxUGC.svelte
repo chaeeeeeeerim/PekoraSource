@@ -50,11 +50,19 @@
 					}
 					disabled = true;
 					createdAssetId = undefined;
+					const urlInput = document.getElementById("url") as HTMLInputElement;
+					const match = urlInput.value.trim().match(/(?:catalog|library|bundles)\/(\d+)|[?&]id=(\d+)|\b(\d{3,})\b/i);
+					const assetId = match ? Number(match[1] || match[2] || match[3]) : NaN;
+					if (!Number.isSafeInteger(assetId) || assetId <= 0) {
+						errorMessage = "Enter a valid Roblox catalog or asset URL containing its numeric ID.";
+						disabled = false;
+						return;
+					}
+					errorMessage = undefined;
 					request
 						.post("/asset/backport-from-roblox", {
-							// @ts-ignore
-							assetId: parseInt(document.getElementById("url").value.match(/[0-9]+/)[0], 10),
-							force: force ==='true' ? true : false,
+							assetId,
+							force: force === 'true',
 						})
 						.then((d) => {
 							// window.location.href = `/catalog/${d.data.assetId}/--`;
