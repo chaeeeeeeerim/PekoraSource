@@ -1,25 +1,28 @@
-// API "auth" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi auth bridge: uses the existing Pekora session cookie. Login/application stay on Pekora's
+// Razor routes so captcha, rate limits, 2FA, approvals and session creation are not bypassed.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("auth", {
-  discordStatus: E("GET"),
-  applicationCode: E("GET"),
-  applicationStatus: E("GET"),
-  applyAccount: E("POST"),
-  forgotPassword: E("POST"),
-  login: E("POST"),
-  logout: E("POST"),
-  me: E("GET"),
-  resetPassword: E("POST"),
-  signup: E("POST"),
-  twoFactorDisable: E("POST"),
-  twoFactorEnable: E("POST"),
-  twoFactorStatus: E("GET"),
-  twoFactorVerify: E("POST"),
-  verifyAccount: E("POST")
+    discordStatus: E("GET"),
+    applicationCode: E("GET"),
+    applicationStatus: E("GET"),
+    applyAccount: E("POST"),
+    forgotPassword: E("POST"),
+    login: E("POST"),
+    logout: E("POST"),
+    me: E("GET", {
+      p: "/users/authenticated",
+      adapt: function (r) {
+        if (!r || r.id == null || !r.name) return r;
+        return { id: r.id, username: r.name, displayName: r.displayName || r.name, isStaff: r.isStaff };
+      }
+    }),
+    resetPassword: E("POST"),
+    signup: E("POST"),
+    twoFactorDisable: E("POST"),
+    twoFactorEnable: E("POST"),
+    twoFactorStatus: E("GET"),
+    twoFactorVerify: E("POST"),
+    verifyAccount: E("POST")
   });
 })();

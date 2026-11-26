@@ -32,57 +32,37 @@ input,textarea{width:100%;background:#fff;color:#222;border:1px solid #ccc;borde
 <main>
 <div class="al" id="al" role="alert" hidden></div>
 <section id="vL">
-  <h1>Log In</h1>
-  <form id="fL" novalidate><input id="lu" placeholder="Username" autocomplete="username" maxlength="20"><input id="lp" type="password" placeholder="Password" autocomplete="current-password" maxlength="64"><input id="lc" placeholder="6-digit code" inputmode="numeric" autocomplete="one-time-code" hidden><button class="btn" id="bL">Log In</button></form>
-  <hr><h2>How do I make an account?</h2><p class="c">You need to fill out a quick application. This is done to prevent bots and other malicious players from joining. Click the button below to fill out an application.</p><p class="c"><a class="btn" href="#application">Create Application</a></p>
+  <h1>Welcome to Kandi</h1>
+  <p class="c">Entre com sua conta Pekora. O sistema original continuará responsável pela senha, captcha, autenticação de dois fatores e criação de sessão.</p>
+  <p class="c"><a class="btn" href="/auth/accountlogin">Log In</a></p>
+  <hr><h2>New here?</h2>
+  <p class="c">O cadastro e a aprovação continuam seguindo o processo oficial do backend Pekora.</p>
+  <p class="c"><a class="btn" href="/auth/application">Create Application</a></p>
 </section>
 <section id="vA" hidden>
-  <h1>Application</h1><p class="c mu">Your application is checked by our Discord bot. You stay on this screen until you are approved.</p>
-  <form id="fA" novalidate>
-    <div class="st">Step 1 - Account</div><input id="au" placeholder="Username" autocomplete="username" maxlength="20"><input id="ap" type="password" placeholder="Password" autocomplete="new-password" maxlength="64">
-    <div class="st">Step 2 - Verification code</div><p>Join the Kandi Discord server and change your <b>server nickname</b> to the code below. The bot checks it automatically.</p><div class="bx" id="cd">Loading code...</div><p><button class="btn s" type="button" id="nc">New code</button> <a class="l" id="dl" href="#">Open Discord server</a></p>
-    <div class="st">Step 3 - About you (optional)</div><textarea id="ab" maxlength="4000" placeholder="About me (up to 4,000 characters)"></textarea>
-    <div class="st">Step 4 - Referral (optional)</div><input id="rf" placeholder="Referral code" maxlength="40"><p class="mu">The code owner gets 50 Robux and you get 30 Robux (paid by the server).</p>
-    <button class="btn" id="bA">Submit Application</button>
-  </form>
-  <div id="done" hidden><div class="al ok" id="dm"></div><p class="c"><button class="btn" id="cs">Check status</button></p><p class="c mu">Keep your Discord nickname as the code until you are approved.</p></div>
+  <h1>Account Application</h1>
+  <p class="c">A inscrição é processada pelo backend Pekora, incluindo suas verificações e regras de aprovação.</p>
+  <p class="c"><a class="btn" href="/auth/application">Continue to Application</a></p>
+  <p class="c"><a class="l" href="/auth/accountlogin">Already have an account? Log in</a></p>
 </section>
 </main>
 <div id="tb" hidden>TEST MODE</div>
 <script src="js/config.js"></script>
-<script src="js/extras.js"></script>
-<script src="js/testdata.js"></script>
 <script src="js/api.js"></script>
 <script src="js/api/auth.js"></script>
 <script>
 (function () {
-  var C = window.KANDI_CONFIG, A = window.KandiAPI, $ = function (i) { return document.getElementById(i); }, code = "";
-  var APP = C.APP_URL || "app.html";
-  if (C.TEST_MODE) $("tb").hidden = false;
-  function say(m, ok) { var a = $("al"); a.textContent = m || ""; a.hidden = !m; a.className = "al" + (ok ? " ok" : ""); }
-  function fail(e) { var f = e.fields && Object.keys(e.fields).map(function (k) { return e.fields[k]; }).join(" "); if (e.data && e.data.twoFactor) $("lc").hidden = false; say(f || e.message || "Something went wrong."); }
-  function view() { var a = location.hash === "#application"; $("vL").hidden = a; $("vA").hidden = !a; $("tL").classList.toggle("on", !a); $("tA").classList.toggle("on", a); say(""); if (a && !code) newCode(); }
+  function view() {
+    var app = location.hash === "#application";
+    document.getElementById("vL").hidden = app;
+    document.getElementById("vA").hidden = !app;
+    document.getElementById("tL").classList.toggle("on", !app);
+    document.getElementById("tA").classList.toggle("on", app);
+  }
   window.addEventListener("hashchange", view);
-  // TODO(backend): o código TEM que ser gerado e guardado no servidor (ligado ao username), senão o bot não consegue conferir. Formato esperado (NÃO VERIFICADO): { code }.
-  function newCode() { $("cd").textContent = "Loading code..."; A.call("auth.applicationCode", { query: { username: $("au").value.trim() } }).then(function (r) { code = (r && (r.code || r.phrase)) || ""; $("cd").textContent = code || "No code received."; }).catch(function (e) { code = ""; $("cd").textContent = e.kind === "unconnected" ? "Not connected yet: the server will generate your code." : e.message; }); }
-  $("nc").onclick = newCode;
-  var inv = C.DISCORD_INVITE; if (!inv || inv === "#") { $("dl").removeAttribute("href"); $("dl").textContent = "Discord invite not configured yet"; } else $("dl").href = inv;
-  $("fL").onsubmit = function (e) {
-    e.preventDefault(); var u = $("lu").value.trim(), p = $("lp").value; if (!u || !p) { say("Enter your username and password."); return; }
-    say(""); var b = $("bL"); b.disabled = true;
-    A.login({ username: u, password: p, code: $("lc").hidden ? undefined : $("lc").value.trim() }).then(function () { location.href = APP + "#home"; }).catch(fail).then(function () { b.disabled = false; });
-  };
-  $("fA").onsubmit = function (e) {
-    e.preventDefault(); var u = $("au").value.trim(), p = $("ap").value;
-    if (!/^[A-Za-z0-9_]{3,20}$/.test(u)) { say("Username must be 3-20 letters, numbers or underscores."); return; }
-    if (p.length < 6) { say("Password must be at least 6 characters."); return; }
-    if (!code) { say("Wait for the verification code first."); return; }
-    say(""); var b = $("bA"); b.disabled = true;
-    // A senha só vai para o backend; nunca é guardada no navegador.
-    A.call("auth.applyAccount", { body: { username: u, password: p, code: code, about: $("ab").value.trim(), referral: $("rf").value.trim() } }).then(function (r) { $("fA").hidden = true; $("done").hidden = false; $("dm").textContent = (r && r.message) || "Application submitted. Waiting for the bot to verify your nickname."; window.scrollTo(0, 0); }).catch(fail).then(function () { b.disabled = false; });
-  };
-  $("cs").onclick = function () { A.call("auth.applicationStatus", { query: { username: $("au").value.trim() } }).then(function (r) { say((r && r.message) || (r && r.status) || "No status received.", true); }).catch(fail); };
   view();
+  // Existing Pekora sessions go straight to the Kandi app; anonymous visitors see this landing page.
+  if (window.KandiAPI) window.KandiAPI.me().then(function () { location.replace("app.html#home"); }).catch(function (e) { if (e && e.kind === "format") location.replace("/auth/application"); });
 })();
 </script>
 </body>

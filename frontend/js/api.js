@@ -172,8 +172,10 @@
     var p = d.p || (C.USE_STUB && STUB[name] ? C.ENDPOINTS[STUB[name]] : "");
     if (!p) throw new ApiError(501, "Not connected yet: " + name + " (edit js/api/" + name.split(".")[0] + ".js)", null, "unconnected");
     var base = baseFor(d); if (!base && !/^https?:/.test(p)) throw new ApiError(0, "API_BASE is not configured (js/config.js).", null, "config");
-    var path = p.replace(/\{(\w+)\}/g, function (_, k) { if (!o.params || o.params[k] == null) throw new ApiError(0, "Missing parameter: " + k, null, "config"); return encodeURIComponent(o.params[k]); });
-    var r = await send(m, base + path, d, o), out;
+    var routeParams = typeof d.params === "function" ? d.params(o.params || {}, o) : (o.params || {});
+    var path = p.replace(/\{(\w+)\}/g, function (_, k) { if (routeParams[k] == null) throw new ApiError(0, "Missing parameter: " + k, null, "config"); return encodeURIComponent(routeParams[k]); });
+    var requestOptions = typeof d.prepare === "function" ? (d.prepare(o) || o) : o;
+    var r = await send(m, base + path, d, requestOptions), out;
     try { out = d.adapt ? d.adapt(r, o) : r; }
     catch (e) { if (e instanceof ApiError) throw e; throw new ApiError(0, "The server response for " + name + " does not match the format the page expects.", null, "format"); }
     check(name, out);

@@ -122,6 +122,21 @@ builder.Services.AddMvc(c =>
 
 var app = builder.Build();
 app.UseRouting();
+
+// Project Kandi is served by the same ASP.NET Core application as the Pekora backend.
+// This keeps the browser on one origin so the existing Pekora session and CSRF cookies work.
+var kandiFrontendPath = Path.Combine(builder.Environment.ContentRootPath, "frontend");
+if (Directory.Exists(kandiFrontendPath))
+{
+    var kandiFiles = new PhysicalFileProvider(kandiFrontendPath);
+    app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = kandiFiles });
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = kandiFiles,
+        RequestPath = "",
+    });
+}
+
 app.UseSwaggerUI(c =>
 {
     c.ShowCommonExtensions();
@@ -227,4 +242,5 @@ app.UseWebSockets();
 app.UseRequestDecompression();
 app.MapHub<MessageRouterHub>("/v1/router/signalr");
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/home", () => Results.Redirect("/app.html#home"));
 app.Run();

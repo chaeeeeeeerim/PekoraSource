@@ -23,6 +23,8 @@ public class FrontendProxyMiddleware
 
     public static List<string> BypassUrls = new()
     {
+        // Pekora JSON API controllers must be handled by ASP.NET, never by the legacy frontend proxy.
+        "/apisite/",
         "/apisite/",
         "/swagger/",
         "/health",
@@ -226,7 +228,15 @@ public class FrontendProxyMiddleware
         }
     #endif
 
-        // Make a proxy request
+        // The unified deployment serves Kandi from local static files. Keep the old proxy
+        // available only when explicitly configured for a legacy external frontend.
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("FRONTEND_PROXY_BASE_URL")))
+        {
+            await _next(ctx);
+            return;
+        }
+
+        // Make a proxy request only for an explicitly configured legacy frontend.
         var result = await ProxyRequestAsync(ctx, requestUrl);
         var resultStream = await result.Content.ReadAsStreamAsync();
 

@@ -9,9 +9,7 @@ AssetValidationService
 deployment
 economy-chat
 
-# Not needed by the ASP.NET website container
-frontend
-game-renderer
+# Not needed by the ASP.NET website containergame-renderer
 RCCService
 game-server/src
 game-server/tests
