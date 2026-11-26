@@ -13,7 +13,9 @@ namespace Roblox.Rendering
     public class RenderingHandler
     {
         private static Random RandomComponent = new Random();
-        private static HttpClient client = new HttpClient();
+        private static readonly HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(90) };
+        private static Uri? rendererBaseUri;
+        private static string? rendererToken;
         // TODO: REWRITE RENDERING HANDLER
         private enum RenderType
         {
@@ -43,7 +45,25 @@ namespace Roblox.Rendering
         }
         public static void Configure()
         {
+            // This endpoint must be an adapter implementing the JSON routes below.
+            // Native RCCService 2020 uses a different job protocol.
+            var configuredUrl = Environment.GetEnvironmentVariable("RENDERING_SERVICE_BASE_URL")
+                ?? Environment.GetEnvironmentVariable("Rendering__BaseUrl");
+            rendererToken = Environment.GetEnvironmentVariable("RENDERING_SERVICE_TOKEN")
+                ?? Environment.GetEnvironmentVariable("Rendering__Authorization");
 
+            if (string.IsNullOrWhiteSpace(configuredUrl))
+            {
+                rendererBaseUri = null;
+                Console.WriteLine("[RenderingHandler] Disabled: configure RENDERING_SERVICE_BASE_URL for the RCC 2020 adapter.");
+                return;
+            }
+
+            if (!Uri.TryCreate(configuredUrl, UriKind.Absolute, out var parsed) ||
+                (parsed.Scheme != Uri.UriSchemeHttp && parsed.Scheme != Uri.UriSchemeHttps))
+                throw new InvalidOperationException("RENDERING_SERVICE_BASE_URL must be an absolute HTTP(S) URL.");
+
+            rendererBaseUri = new Uri(parsed.ToString().TrimEnd('/') + "/");
         }
         public static Dictionary<long, string> allowedPlaceForRender = new Dictionary<long, string>();
         private static async Task<dynamic> SendRenderRequest(long id, RenderType type, int? x = 0, int? y = 0, bool? isFace = false, string? assetUrl = null, string? characterAppearanceUrl = null, string? animationUrl = null)
@@ -127,13 +147,26 @@ namespace Roblox.Rendering
                     url = "catalog/animation";
                     break;
             }
-            // i will add error handling to this later
-            var content = new StringContent(JsonSerializer.Serialize(renderRequest), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("http://176.100.36.98:7832/" + url, content);
+            if (rendererBaseUri is null)
+                throw new InvalidOperationException("Rendering is not configured. Set RENDERING_SERVICE_BASE_URL to the RCC 2020 adapter URL.");
+
+            using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(rendererBaseUri, url))
+            {
+                Content = new StringContent(JsonSerializer.Serialize(renderRequest), Encoding.UTF8, "application/json")
+            };
+            if (!string.IsNullOrWhiteSpace(rendererToken))
+                request.Headers.TryAddWithoutValidation("Authorization", "Bearer " + rendererToken);
+
+            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+            var renderResult = await response.Content.ReadFromJsonAsync<RenderResponse>();
             sw.Stop();
-            var request = await response.Content.ReadFromJsonAsync<RenderResponse>();
-            Console.WriteLine($"[RenderingHandler] Request took {sw.ElapsedMilliseconds}ms");
-            return request?.data ?? "FAILURE";
+            Console.WriteLine($"[RenderingHandler] Request to {url} took {sw.ElapsedMilliseconds}ms");
+
+            if (renderResult is null || !renderResult.success || string.IsNullOrWhiteSpace(renderResult.data))
+                throw new InvalidOperationException("Rendering adapter returned an unsuccessful or empty result: " +
+                    (renderResult?.message ?? "No response data."));
+            return renderResult.data;
         }
 
         public static async Task<string> RequestHatThumbnail(long assetId)
