@@ -19,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Render injects configuration through environment variables. ASP.NET Core maps
 // double underscores (__) to nested configuration keys.
 IConfiguration configuration = builder.Configuration;
+Roblox.Configuration.RequireUserApplication = configuration.GetValue<bool>("RequireUserApplication", false);
 
 // DB
 Roblox.Services.Database.Configure(configuration.GetSection("Postgres").Value!);
