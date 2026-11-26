@@ -27,42 +27,106 @@ input,textarea{width:100%;background:#fff;color:#222;border:1px solid #ccc;borde
 </style>
 </head>
 <body>
-<nav class="tabs" role="tablist"><a href="#login" id="tL" role="tab">Login</a><a href="#application" id="tA" role="tab">Create Application</a></nav>
-<div class="hero" role="img" aria-label="Project Kandi"><b>Powering Nostalgia</b></div>
+<nav class="tabs" role="tablist"><a href="#login" id="tL" role="tab">Login</a><a href="#signup" id="tA" role="tab">Create Account</a></nav>
+<div class="hero" role="img" aria-label="Project Kandi"><b>Powering Creativity and Nostalgia</b></div>
 <main>
-<div class="al" id="al" role="alert" hidden></div>
-<section id="vL">
-  <h1>Welcome to Kandi</h1>
-  <p class="c">Entre com sua conta Pekora. O sistema original continuará responsável pela senha, captcha, autenticação de dois fatores e criação de sessão.</p>
-  <p class="c"><a class="btn" href="/auth/accountlogin">Log In</a></p>
-  <hr><h2>New here?</h2>
-  <p class="c">O cadastro e a aprovação continuam seguindo o processo oficial do backend Pekora.</p>
-  <p class="c"><a class="btn" href="/auth/application">Create Application</a></p>
-</section>
-<section id="vA" hidden>
-  <h1>Account Application</h1>
-  <p class="c">A inscrição é processada pelo backend Pekora, incluindo suas verificações e regras de aprovação.</p>
-  <p class="c"><a class="btn" href="/auth/application">Continue to Application</a></p>
-  <p class="c"><a class="l" href="/auth/accountlogin">Already have an account? Log in</a></p>
-</section>
+  <div class="al" id="al" role="alert" hidden></div>
+  <section id="vL">
+    <h1>Welcome to Kandi</h1>
+    <p class="c mu">Sign in with your Kandi username and password.</p>
+    <form id="fL" novalidate>
+      <input id="lu" name="username" placeholder="Username" autocomplete="username" maxlength="20" required>
+      <input id="lp" name="password" type="password" placeholder="Password" autocomplete="current-password" maxlength="128" required>
+      <input id="lc" placeholder="2FA code (if enabled)" inputmode="numeric" autocomplete="one-time-code" maxlength="8" hidden>
+      <button class="btn" id="bL" type="submit">Log In</button>
+    </form>
+    <hr><p class="c">New to Kandi?</p>
+    <p class="c"><a class="btn" href="#signup">Create Account</a></p>
+  </section>
+  <section id="vA" hidden>
+    <h1>Create Account</h1>
+    <p class="c mu">Create an account using a username and password. Discord verification and account applications are disabled.</p>
+    <form id="fA" novalidate>
+      <input id="au" name="username" placeholder="Username" autocomplete="username" maxlength="20" required>
+      <input id="ap" name="new-password" type="password" placeholder="Password" autocomplete="new-password" maxlength="128" required>
+      <button class="btn" id="bA" type="submit">Create Account</button>
+    </form>
+  </section>
 </main>
-<div id="tb" hidden>TEST MODE</div>
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/api/auth.js"></script>
 <script>
 (function () {
-  function view() {
-    var app = location.hash === "#application";
-    document.getElementById("vL").hidden = app;
-    document.getElementById("vA").hidden = !app;
-    document.getElementById("tL").classList.toggle("on", !app);
-    document.getElementById("tA").classList.toggle("on", app);
+  "use strict";
+  var A = window.KandiAPI;
+  var C = window.KANDI_CONFIG || {};
+  var $ = function (id) { return document.getElementById(id); };
+  var APP = C.APP_URL || "app.html";
+
+  function say(message) {
+    var el = $("al");
+    el.textContent = message || "";
+    el.hidden = !message;
   }
+  function fail(error) {
+    if (error && error.status === 401 && error.data && error.data.twoFactor) $("lc").hidden = false;
+    var fields = error && error.fields
+      ? Object.keys(error.fields).map(function (key) { return error.fields[key]; }).join(" ")
+      : "";
+    say(fields || (error && error.message) || "Could not complete the request.");
+  }
+  function view() {
+    var signup = location.hash === "#signup";
+    $("vL").hidden = signup;
+    $("vA").hidden = !signup;
+    $("tL").classList.toggle("on", !signup);
+    $("tA").classList.toggle("on", signup);
+    say("");
+  }
+
   window.addEventListener("hashchange", view);
   view();
-  // Existing Pekora sessions go straight to the Kandi app; anonymous visitors see this landing page.
-  if (window.KandiAPI) window.KandiAPI.me().then(function () { location.replace("app.html#home"); }).catch(function (e) { if (e && e.kind === "format") location.replace("/auth/application"); });
+
+  if (A) {
+    A.me().then(function () {
+      location.replace(APP + "#home");
+    }).catch(function (error) {
+      if (error && error.kind === "network") say("The Kandi server could not be reached.");
+    });
+  }
+
+  $("fL").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var username = $("lu").value.trim();
+    var password = $("lp").value;
+    var code = $("lc").hidden ? "" : $("lc").value.trim();
+    if (!username || !password) return say("Enter your username and password.");
+    say("");
+    var button = $("bL");
+    button.disabled = true;
+    A.login({ username: code ? username + "|" + code : username, password: password })
+      .then(function () { location.replace(APP + "#home"); })
+      .catch(fail)
+      .then(function () { button.disabled = false; });
+  });
+
+  $("fA").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var username = $("au").value.trim();
+    var password = $("ap").value;
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(username))
+      return say("Username must be 3-20 letters, numbers or underscores.");
+    if (password.length < 6)
+      return say("Password must be at least 6 characters.");
+    say("");
+    var button = $("bA");
+    button.disabled = true;
+    A.signup({ username: username, password: password })
+      .then(function () { location.replace(APP + "#home"); })
+      .catch(fail)
+      .then(function () { button.disabled = false; });
+  });
 })();
 </script>
 </body>
