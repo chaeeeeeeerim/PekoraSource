@@ -23,6 +23,7 @@ The proxy forwards session cookies and the CSRF token and preserves `Set-Cookie`
 - Configure `RCC_SOAP_SCRIPTS_DIRECTORY` to the absolute path of `RCCService/RCCService2020/internalscripts/thumbnails`.
 - Set `RCC_SOAP_NAMESPACE` to the SOAP namespace compiled into the RCC binary (defaults to `http://roblox.com/`).
 - Set `RCC_HEAD_MANNEQUIN_ID` to a valid Kandi-hosted mannequin asset ID for head thumbnails.
+- Set `KANDI_UGC_ALLOWED_SOURCE_ASSET_IDS` on the ASP.NET backend to a comma-separated allowlist of source asset IDs that Kandi owns or has explicit permission to republish. An empty value intentionally disables external UGC imports.
 - The backend only submits fixed scripts from the repository and rejects public RCC endpoints. The network firewall must still allow only the backend/VPN peer to reach the RCC port.
 - Hat, mesh, mesh-part, model, image, head, and emote thumbnail jobs use RCCService 2020. Other render types still require a separately managed compatible renderer until their RCC scripts are wired in.
 - Vercel is only the frontend/API proxy in this test setup. It is not the Windows RCC host.
