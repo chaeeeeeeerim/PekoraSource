@@ -144,7 +144,7 @@ public class AdminApiController : ControllerBase
         return Content(adminBundleHtml, "text/html");
     }
 
-    [HttpGet("permissions")]
+    [HttpGet("permissions"), StaffFilter(Access.GetStats)]
     public async Task<dynamic> GetPermissions()
     {
         var isOwner = StaffFilter.IsOwner(userSession.userId);
