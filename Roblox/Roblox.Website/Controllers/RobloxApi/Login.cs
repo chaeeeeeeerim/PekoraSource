@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Roblox.Services.Exceptions;
 using Roblox.AbuseDetection.Report;
 using Roblox.Models.Users;
+using Roblox.Website.Middleware;
 using Roblox.Website.WebsiteModels.Authentication;
 using System.Web;
 using Roblox.Dto.Users;
@@ -58,12 +59,44 @@ namespace Roblox.Website.Controllers
             };
         }
 
+        [HttpGetBypass("v1/me")]
+        public async Task<dynamic> MeV1()
+        {
+            var session = safeUserSession;
+            var user = await services.users.GetUserById(session.userId);
+            var balance = await services.economy.GetUserBalance(session.userId);
+            return new
+            {
+                user = new
+                {
+                    id = user.userId,
+                    username = user.username,
+                    currency = balance.robux,
+                    tickets = balance.tickets,
+                },
+            };
+        }
+
+        [HttpPostBypass("v1/logout")]
+        public async Task<IActionResult> LogoutV1()
+        {
+            if (userSession != null)
+                await services.users.DeleteSession(userSession.sessionId);
+            Response.Cookies.Delete(SessionMiddleware.CookieName, new CookieOptions
+            {
+                Path = "/",
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+            });
+            return NoContent();
+        }
+
         [HttpPostBypass("v1/login")]
         public async Task<dynamic> LoginV1([FromBody] LoginRequest request)
         {
             FeatureCheck();
             await RateLimitCheck();
-            string username = request.cvalue;
+            string username = request.username ?? request.cvalue;
             string password = request.password;
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 throw new BadRequestException((int)LoginError400.UsernamePasswordRequired, "Username or password is missing.");
