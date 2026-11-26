@@ -1,22 +1,25 @@
 {
   "redirects": [
     {
-      "source": "/admin",
-      "destination": "/Admin/",
-      "permanent": false
-    },
-    {
-      "source": "/admin/:path*",
-      "destination": "/Admin/:path*",
-      "permanent": false
-    },
-    {
       "source": "/Admin",
-      "destination": "/Admin/",
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/Admin/:path*",
+      "destination": "/admin/:path*",
       "permanent": false
     }
   ],
   "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/api/proxy?path=/admin/"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/api/proxy?path=/admin/:path*"
+    },
     {
       "source": "/apisite/:path*",
       "destination": "/api/proxy?path=/apisite/:path*"
