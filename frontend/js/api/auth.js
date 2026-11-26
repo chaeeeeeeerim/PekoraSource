@@ -9,7 +9,7 @@
     applyAccount: E("POST"),
     forgotPassword: E("POST"),
     login: E("POST"),
-    logout: E("POST"),
+    logout: E("POST", { p: "/auth/v2/logout" }),
     me: E("GET", {
       p: "/users/authenticated",
       adapt: function (r) {
