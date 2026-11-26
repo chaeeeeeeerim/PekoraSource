@@ -9,8 +9,8 @@ window.KANDI_CONFIG = {
   // Sessão Pekora: cookie HttpOnly .PEKOSECURITY na mesma origem; o navegador o envia automaticamente.
   AUTH_MODE: "cookie",
   TOKEN_KEY: "kandi_token",
-  // API base e CSRF foram confirmados no código; autenticação JSON ainda não existe no Pekora.
-  CONFIRMED: { api: true, auth: true, csrf: true },
+  // API base e CSRF foram confirmados. O fluxo quick auth usa endpoints próprios; outros métodos de conta continuam pendentes.
+  CONFIRMED: { api: true, auth: false, csrf: true },
   TIMEOUT_MS: 10000,
   UPLOAD_TIMEOUT_MS: 120000,   // uploads (FormData) podem demorar mais
   PAGE_SIZE: 24,
