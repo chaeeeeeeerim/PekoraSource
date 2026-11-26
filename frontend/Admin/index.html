@@ -1,43 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex">
-<title>Admin - Project Kandi</title>
-<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="../assets/favicon-192.png">
-<link rel="apple-touch-icon" href="../assets/favicon-192.png">
-<meta property="og:type" content="website"><meta property="og:title" content="Project Kandi"><meta property="og:description" content="Project Kandi. Powering Nostalgia.">
-<!-- TODO: og:image/twitter:image precisam de URL absoluta do domínio final (ex.: https://SEU-DOMINIO/assets/og-image.jpg) para a prévia funcionar em redes sociais. -->
-<meta property="og:image" content="../assets/og-image.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="../assets/og-image.jpg">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/admin.css">
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="refresh" content="0;url=/admin/">
+  <title>Project Kandi Admin</title>
 </head>
 <body>
-<div id="root"></div>
-<script>
-(function () {
-  var root = document.getElementById("root");
-  function showFailure(message) {
-    if (!root || (root.textContent && root.textContent.trim())) return;
-    root.innerHTML = '<main style="min-height:100vh;display:grid;place-items:center;padding:24px;background:#fff7fb;color:#302431;font:14px/1.5 Arial,sans-serif"><section style="max-width:520px;padding:24px;border:1px solid #f0cddd;border-radius:12px;background:#fff"><h1 style="margin-top:0">Kandi Admin could not start</h1><p>The admin interface failed to load. Refresh the page and check the browser console or Vercel deployment logs.</p><pre style="white-space:pre-wrap;overflow-wrap:anywhere;color:#9b245e"></pre><a href="/">Back to Kandi</a></section></main>';
-    root.querySelector("pre").textContent = String(message || "Unknown startup error");
-  }
-  window.addEventListener("error", function (event) {
-    showFailure(event.message || (event.target && event.target.src) || "A script or asset failed to load");
-  }, true);
-  window.addEventListener("unhandledrejection", function (event) {
-    showFailure(event.reason && event.reason.message || event.reason || "Unhandled promise rejection");
-  });
-})();
-</script>
-<!-- Painel administrativo (SÓ FRONTEND). Ordem importa: config -> dados demo -> camada de dados -> UI -> páginas -> boot. -->
-<script src="js/config.js"></script>
-<script src="js/data/demo-data.js"></script>
-<script src="js/data/admin-data.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/pages.js"></script>
-<script src="js/app.js"></script>
+  <p>Opening the authenticated admin panel…</p>
+  <p><a href="/admin/">Continue</a></p>
+  <script>window.location.replace("/admin/");</script>
 </body>
 </html>
