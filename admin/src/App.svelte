@@ -178,7 +178,7 @@ import GiftAllUsers from "./pages/GiftAllUsers.svelte";
 		<div class="container py-5" role="alert">
 			<h1>Admin panel unavailable</h1>
 			<p>The permission check could not be completed. This is usually a session, network, or backend error.</p>
-			<p>{error?.message ?? "Unknown error"}</p>
+			<p>{error && error.message ? error.message : "Unknown error"}</p>
 			<button class="btn btn-primary" on:click={() => window.location.reload()}>Try again</button>
 		</div>
 	{/await}
