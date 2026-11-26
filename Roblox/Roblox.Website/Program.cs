@@ -122,6 +122,9 @@ builder.Services.AddMvc(c =>
 
 var app = builder.Build();
 app.UseRouting();
+// Kandi is the primary website and is served by the same ASP.NET Core host as the API.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseSwaggerUI(c =>
 {
     c.ShowCommonExtensions();
