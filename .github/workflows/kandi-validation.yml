@@ -1,0 +1,32 @@
+name: Kandi build validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [fix/kandi-revival-final]
+  workflow_dispatch:
+
+jobs:
+  admin-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build Svelte admin bundle
+        working-directory: admin
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+
+  dotnet-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish ASP.NET backend
+        run: dotnet publish Roblox/Roblox.Website/Roblox.Website.csproj --configuration Release --output ./artifacts/publish
