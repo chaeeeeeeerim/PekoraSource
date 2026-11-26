@@ -27,28 +27,21 @@ input,textarea{width:100%;background:#fff;color:#222;border:1px solid #ccc;borde
 </style>
 </head>
 <body>
-<nav class="tabs" role="tablist"><a href="#login" id="tL" role="tab">Login</a><a href="#application" id="tA" role="tab">Create Application</a></nav>
-<div class="hero" role="img" aria-label="Project Kandi"><b>Powering Nostalgia</b></div>
+<nav class="tabs" role="tablist"><a href="#login" id="tL" role="tab">Login</a><a href="#signup" id="tA" role="tab">Create Account</a></nav>
+<div class="hero" role="img" aria-label="Project Kandi"><b>Powering Creativity and Nostalgia</b></div>
 <main>
 <div class="al" id="al" role="alert" hidden></div>
 <section id="vL">
   <h1>Log In</h1>
-  <form id="fL" novalidate><input id="lu" placeholder="Username" autocomplete="username" maxlength="20"><input id="lp" type="password" placeholder="Password" autocomplete="current-password" maxlength="64"><input id="lc" placeholder="6-digit code" inputmode="numeric" autocomplete="one-time-code" hidden><button class="btn" id="bL">Log In</button></form>
-  <hr><h2>How do I make an account?</h2><p class="c">You need to fill out a quick application. This is done to prevent bots and other malicious players from joining. Click the button below to fill out an application.</p><p class="c"><a class="btn" href="#application">Create Application</a></p>
+  <form id="fL" novalidate><input id="lu" placeholder="Username" autocomplete="username" maxlength="20" required><input id="lp" type="password" placeholder="Password" autocomplete="current-password" maxlength="128" required><input id="lc" placeholder="6-digit code (if enabled)" inputmode="numeric" autocomplete="one-time-code" hidden><button class="btn" id="bL">Log In</button></form>
+  <hr><p class="c">New to Kandi?</p><p class="c"><a class="btn" href="#signup">Create Account</a></p>
 </section>
 <section id="vA" hidden>
-  <h1>Application</h1><p class="c mu">Your application is checked by our Discord bot. You stay on this screen until you are approved.</p>
-  <form id="fA" novalidate>
-    <div class="st">Step 1 - Account</div><input id="au" placeholder="Username" autocomplete="username" maxlength="20"><input id="ap" type="password" placeholder="Password" autocomplete="new-password" maxlength="64">
-    <div class="st">Step 2 - Verification code</div><p>Join the Kandi Discord server and change your <b>server nickname</b> to the code below. The bot checks it automatically.</p><div class="bx" id="cd">Loading code...</div><p><button class="btn s" type="button" id="nc">New code</button> <a class="l" id="dl" href="#">Open Discord server</a></p>
-    <div class="st">Step 3 - About you (optional)</div><textarea id="ab" maxlength="4000" placeholder="About me (up to 4,000 characters)"></textarea>
-    <div class="st">Step 4 - Referral (optional)</div><input id="rf" placeholder="Referral code" maxlength="40"><p class="mu">The code owner gets 50 Robux and you get 30 Robux (paid by the server).</p>
-    <button class="btn" id="bA">Submit Application</button>
-  </form>
-  <div id="done" hidden><div class="al ok" id="dm"></div><p class="c"><button class="btn" id="cs">Check status</button></p><p class="c mu">Keep your Discord nickname as the code until you are approved.</p></div>
+  <h1>Create Account</h1>
+  <p class="c mu">Create your Kandi account with a username and password. Discord verification and account applications are disabled.</p>
+  <form id="fA" novalidate><input id="au" placeholder="Username" autocomplete="username" maxlength="20" required><input id="ap" type="password" placeholder="Password" autocomplete="new-password" maxlength="128" required><button class="btn" id="bA">Create Account</button></form>
 </section>
 </main>
-<div id="tb" hidden>TEST MODE</div>
 <script src="js/config.js"></script>
 <script src="js/extras.js"></script>
 <script src="js/testdata.js"></script>
@@ -56,32 +49,48 @@ input,textarea{width:100%;background:#fff;color:#222;border:1px solid #ccc;borde
 <script src="js/api/auth.js"></script>
 <script>
 (function () {
-  var C = window.KANDI_CONFIG, A = window.KandiAPI, $ = function (i) { return document.getElementById(i); }, code = "";
+  "use strict";
+  var C = window.KANDI_CONFIG, A = window.KandiAPI;
+  var $ = function (id) { return document.getElementById(id); };
   var APP = C.APP_URL || "app.html";
-  if (C.TEST_MODE) $("tb").hidden = false;
-  function say(m, ok) { var a = $("al"); a.textContent = m || ""; a.hidden = !m; a.className = "al" + (ok ? " ok" : ""); }
-  function fail(e) { var f = e.fields && Object.keys(e.fields).map(function (k) { return e.fields[k]; }).join(" "); if (e.data && e.data.twoFactor) $("lc").hidden = false; say(f || e.message || "Something went wrong."); }
-  function view() { var a = location.hash === "#application"; $("vL").hidden = a; $("vA").hidden = !a; $("tL").classList.toggle("on", !a); $("tA").classList.toggle("on", a); say(""); if (a && !code) newCode(); }
+  function say(message) { var el = $("al"); el.textContent = message || ""; el.hidden = !message; }
+  function fail(error) {
+    if (error && error.status === 401 && error.data && error.data.twoFactor) $("lc").hidden = false;
+    var fields = error && error.fields ? Object.keys(error.fields).map(function (key) { return error.fields[key]; }).join(" ") : "";
+    say(fields || (error && error.message) || "Something went wrong.");
+  }
+  function view() {
+    var signup = location.hash === "#signup";
+    $("vL").hidden = signup;
+    $("vA").hidden = !signup;
+    $("tL").classList.toggle("on", !signup);
+    $("tA").classList.toggle("on", signup);
+    say("");
+  }
   window.addEventListener("hashchange", view);
-  // TODO(backend): o código TEM que ser gerado e guardado no servidor (ligado ao username), senão o bot não consegue conferir. Formato esperado (NÃO VERIFICADO): { code }.
-  function newCode() { $("cd").textContent = "Loading code..."; A.call("auth.applicationCode", { query: { username: $("au").value.trim() } }).then(function (r) { code = (r && (r.code || r.phrase)) || ""; $("cd").textContent = code || "No code received."; }).catch(function (e) { code = ""; $("cd").textContent = e.kind === "unconnected" ? "Not connected yet: the server will generate your code." : e.message; }); }
-  $("nc").onclick = newCode;
-  var inv = C.DISCORD_INVITE; if (!inv || inv === "#") { $("dl").removeAttribute("href"); $("dl").textContent = "Discord invite not configured yet"; } else $("dl").href = inv;
-  $("fL").onsubmit = function (e) {
-    e.preventDefault(); var u = $("lu").value.trim(), p = $("lp").value; if (!u || !p) { say("Enter your username and password."); return; }
-    say(""); var b = $("bL"); b.disabled = true;
-    A.login({ username: u, password: p, code: $("lc").hidden ? undefined : $("lc").value.trim() }).then(function () { location.href = APP + "#home"; }).catch(fail).then(function () { b.disabled = false; });
+  $("fL").onsubmit = function (event) {
+    event.preventDefault();
+    var username = $("lu").value.trim(), password = $("lp").value, code = $("lc").hidden ? "" : $("lc").value.trim();
+    if (!username || !password) return say("Enter your username and password.");
+    say("");
+    var button = $("bL"); button.disabled = true;
+    A.login({ username: code ? username + "|" + code : username, password: password })
+      .then(function () { location.href = APP + "#home"; })
+      .catch(fail)
+      .then(function () { button.disabled = false; });
   };
-  $("fA").onsubmit = function (e) {
-    e.preventDefault(); var u = $("au").value.trim(), p = $("ap").value;
-    if (!/^[A-Za-z0-9_]{3,20}$/.test(u)) { say("Username must be 3-20 letters, numbers or underscores."); return; }
-    if (p.length < 6) { say("Password must be at least 6 characters."); return; }
-    if (!code) { say("Wait for the verification code first."); return; }
-    say(""); var b = $("bA"); b.disabled = true;
-    // A senha só vai para o backend; nunca é guardada no navegador.
-    A.call("auth.applyAccount", { body: { username: u, password: p, code: code, about: $("ab").value.trim(), referral: $("rf").value.trim() } }).then(function (r) { $("fA").hidden = true; $("done").hidden = false; $("dm").textContent = (r && r.message) || "Application submitted. Waiting for the bot to verify your nickname."; window.scrollTo(0, 0); }).catch(fail).then(function () { b.disabled = false; });
+  $("fA").onsubmit = function (event) {
+    event.preventDefault();
+    var username = $("au").value.trim(), password = $("ap").value;
+    if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) return say("Username must be 3-20 letters, numbers or underscores.");
+    if (password.length < 6) return say("Password must be at least 6 characters.");
+    say("");
+    var button = $("bA"); button.disabled = true;
+    A.signup({ username: username, password: password })
+      .then(function () { location.href = APP + "#home"; })
+      .catch(fail)
+      .then(function () { button.disabled = false; });
   };
-  $("cs").onclick = function () { A.call("auth.applicationStatus", { query: { username: $("au").value.trim() } }).then(function (r) { say((r && r.message) || (r && r.status) || "No status received.", true); }).catch(fail); };
   view();
 })();
 </script>
