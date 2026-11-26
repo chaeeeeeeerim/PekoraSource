@@ -35,7 +35,8 @@ internal static class RccSoapRenderer
             throw new InvalidOperationException("RCC_SOAP_NAMESPACE must be an absolute URI.");
 
         var scriptRoot = GetScriptRoot();
-        var script = await File.ReadAllTextAsync(Path.Combine(scriptRoot, type + ".lua"), cancellationToken);
+        var scriptName = type == "Emote" ? "AnimationSilhouette" : type;
+        var script = await File.ReadAllTextAsync(Path.Combine(scriptRoot, scriptName + ".lua"), cancellationToken);
         var jobId = Guid.NewGuid().ToString("D");
         var baseAddress = publicBase.ToString().TrimEnd('/');
         var assetUrl = baseAddress + "/asset/?id=" + assetId;
@@ -89,7 +90,7 @@ internal static class RccSoapRenderer
 
         try
         {
-            var xml = await PostSoapAsync(endpoint, BuildOpenJob(soapNamespace, jobId, type, script, args), cancellationToken);
+            var xml = await PostSoapAsync(endpoint, BuildOpenJob(soapNamespace, jobId, scriptName, script, args), cancellationToken);
             return ReadImageResult(xml);
         }
         finally
