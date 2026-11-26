@@ -1,21 +1,18 @@
-// API "catalog" - STATUS: NÃO CONECTADA. Preencha p (caminho), svc (serviço), m (método) e adapt depois de ler o controller do backend.
-// E(método) cria { m, p: "", svc: "default", auth: true, csrf: true, adapt: null }.
-//  - p: caminho, com {id}/{rowId}/... vindos de params. Vazio = a UI mostra "Not connected yet" (nunca falha em silêncio).
-//  - adapt(resposta, opções): converte a resposta do backend para o formato que a UI espera (ver PEKORA_BACKEND_INTEGRATION.md).
-//  - o método (m) abaixo é um palpite inicial: confirme no backend.
+// Kandi catalog operations mapped to the confirmed Pekora Catalog/Economy routes.
+// Comments, sales history, and legacy limited listings need dedicated backend handlers.
 (function () {
   var E = KandiAPI.E;
   KandiAPI.define("catalog", {
-  search: E("GET"),
-  buyReseller: E("POST"),
-  comments: E("GET"),
-  favorite: E("POST"),
-  get: E("GET"),
-  limiteds: E("GET"),
-  postComment: E("POST"),
-  purchase: E("POST"),
-  recommendations: E("GET"),
-  resellers: E("GET"),
-  salesHistory: E("GET")
+    search: E("GET", { p: "/catalog/v1/search/items" }),
+    buyReseller: E("POST"),
+    comments: E("GET"),
+    favorite: E("POST", { p: "/catalog/v1/favorites/users/{userId}/assets/{assetId}/favorite" }),
+    get: E("POST", { p: "/catalog/v1/catalog/items/details" }),
+    limiteds: E("GET", { p: "/catalog/v1/search/items" }),
+    postComment: E("POST"),
+    purchase: E("POST", { p: "/economy/v1/purchases/products/{assetId}" }),
+    recommendations: E("GET", { p: "/catalog/v1/recommendations/asset/{assetTypeId}" }),
+    resellers: E("GET", { p: "/economy/v1/assets/{assetId}/resellers" }),
+    salesHistory: E("GET")
   });
 })();
