@@ -19,7 +19,7 @@ The proxy forwards session cookies and the CSRF token and preserves `Set-Cookie`
 - Configure `BaseUrl` to the ASP.NET backend's public origin (the RCC worker uses it to fetch Kandi asset content).
 - The Dockerfile now builds `admin/` with Node/Webpack and copies the generated `admin/public/build/bundle.js` and CSS into the backend image. The real admin interface is served by ASP.NET at `/admin/`; `/Admin/` redirects there.
 - The backend hard-codes the admin owner IDs to UID 1 and UID 2. Other staff permissions do not grant admin-panel access.
-- The old account-application flow is disabled by default. `KANDI_DISABLE_APPLICATIONS=false` is the explicit opt-in to restore it.
+- The old account-application flow is disabled by default. `KANDI_DISABLE_APPLICATIONS=false` is the explicit opt-in to restore it. Quick Username/Password signup is enabled by default; set `KANDI_DISABLE_SIGNUP=true` to pause new registrations.
 - New account creation is handled by `/apisite/v1/signup`; it does not require Discord application verification and retains username/password validation, IP cooldown and abuse checks.
 - External UGC source imports are disabled unless `KANDI_UGC_ALLOWED_SOURCE_ASSET_IDS` contains comma-separated asset IDs that Kandi owns or is licensed to republish.
 - Keep PostgreSQL and Redis private.
@@ -30,7 +30,7 @@ The proxy forwards session cookies and the CSRF token and preserves `Set-Cookie`
 - Set `RCC_HEAD_MANNEQUIN_ID` to a valid Kandi-hosted mannequin asset ID for head thumbnails.
 - Set `KANDI_UGC_ALLOWED_SOURCE_ASSET_IDS` on the ASP.NET backend to a comma-separated allowlist of source asset IDs that Kandi owns or has explicit permission to republish. An empty value intentionally disables external UGC imports.
 - The backend only submits fixed scripts from the repository and rejects public RCC endpoints. The network firewall must still allow only the backend/VPN peer to reach the RCC port.
-- Hat, mesh, mesh-part, model, image, head, and emote thumbnail jobs use RCCService 2020. Other render types still require a separately managed compatible renderer until their RCC scripts are wired in.
+- Hat, mesh, mesh-part, model, image, head, and emote thumbnail jobs use RCCService 2020. Other render types still require a separately managed compatible renderer; configure `KANDI_LEGACY_RENDER_API_URL` only if you operate that renderer.
 - Vercel is only the frontend/API proxy in this test setup. It is not the Windows RCC host.
 
 ## Limits
