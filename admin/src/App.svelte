@@ -26,7 +26,6 @@
 	import AssetApproval from "./pages/AssetApproval.svelte";
 	import ManageUsernames from "./pages/ManageUsernames.svelte";
 	import * as rank from "./stores/rank";
-import Lottery from "./pages/Lottery.svelte";
 import FeatureFlags from "./pages/FeatureFlags.svelte";
 import ManageUserTransactions from "./pages/ManageUserTransactions.svelte";
 import Applications from "./pages/Applications.svelte";
@@ -140,9 +139,6 @@ import GiftAllUsers from "./pages/GiftAllUsers.svelte";
 		</Route>
 		<Route path="/admin/asset/approval">
 			<AssetApproval />
-		</Route>
-		<Route path="/admin/lottery">
-			<Lottery />
 		</Route>
 		<Route path="/admin/feature-flags">
 			<FeatureFlags />
