@@ -1,3 +1,11 @@
+# Build the Svelte admin bundle used by the ASP.NET /admin routes.
+FROM node:20-alpine AS admin-build
+WORKDIR /src/admin
+COPY admin/package.json ./
+RUN npm install --no-audit --no-fund
+COPY admin/ ./
+RUN npm run build
+
 # Build the .NET 8 website backend
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -13,7 +21,7 @@ COPY --from=build /app/publish ./
 # Serve the Kandi frontend directly from the Pekora ASP.NET application.
 COPY --from=build /src/frontend ./frontend
 COPY --from=build /src/api/public ./api/public
-COPY --from=build /src/admin/public ./admin/public
+COPY --from=admin-build /src/admin/public ./admin/public
 COPY --from=build /src/Roblox/Roblox.Libraries/Templates ./Roblox/Roblox.Libraries/Templates
 COPY --from=build /src/Roblox/Roblox.Libraries/Json ./Roblox/Roblox.Libraries/Json
 COPY --from=build /src/game-server/scripts ./game-server/scripts
