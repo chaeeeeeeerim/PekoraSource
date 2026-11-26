@@ -42,7 +42,6 @@ public class ApplicationGuardMiddleware
         "/v1/login",
         "/kandi/v1/auth/signup-config",
         "/kandi/v1/auth/signup",
-        // Public Kandi JSON authentication endpoints.
         // razor public
         "/unsecuredcontent/",
         // gs
