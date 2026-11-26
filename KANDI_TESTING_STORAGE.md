@@ -6,8 +6,8 @@ The ZIP's frontend, route registry, Creator Hub, and Admin UI are already presen
 
 - Pages: `/kandi/login` and `/kandi/signup`.
 - Login uses the existing Pekora `POST /v1/login` endpoint, including the existing rate limits, feature flag, password verification, session creation, and optional TOTP code.
-- Signup is implemented by `Roblox/Roblox.Website/Controllers/v1/KandiAuth.cs`. It validates the username and password through the existing UsersService, verifies Cloudflare Turnstile, rate-limits by IP, creates the account using the existing password hasher and database transaction, grants 100 Robux (KANBUX) and 100 Tickets (TIX), then issues the normal HttpOnly Pekora session cookie.
-- Quick signup is **disabled by default**. Set `KANDI_QUICK_SIGNUP_ENABLED=true` only on the isolated test backend. The Turnstile public/private keys must already be configured in the ASP.NET environment. Do not enable this on a public production revival without additional abuse controls and an explicit launch decision.
+- Signup is implemented by `Roblox/Roblox.Website/Controllers/v1/KandiAuth.cs`. It validates the username and password through the existing UsersService, verifies hCaptcha, rate-limits by IP, creates the account using the existing password hasher and database transaction, grants 100 Robux (KANBUX) and 100 Tickets (TIX), then issues the normal HttpOnly Pekora session cookie.
+- Quick signup is **disabled by default**. Set `KANDI_QUICK_SIGNUP_ENABLED=true` only on the isolated test backend; keep it unset on public production deployments. The hCaptcha public/private keys must already be configured in the ASP.NET environment (`HCaptcha:Public` and `HCaptcha:Private`). Do not enable this on a public production revival without additional abuse controls and an explicit launch decision.
 
 ## Persistence
 
