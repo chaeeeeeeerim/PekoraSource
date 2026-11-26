@@ -10,7 +10,7 @@ window.KANDI_CONFIG = {
   AUTH_MODE: "cookie",
   TOKEN_KEY: "kandi_token",
   // API base e CSRF foram confirmados no código; autenticação JSON ainda não existe no Pekora.
-  CONFIRMED: { api: true, auth: true, csrf: true },
+  CONFIRMED: { api: true, auth: false, csrf: true },
   TIMEOUT_MS: 10000,
   UPLOAD_TIMEOUT_MS: 120000,   // uploads (FormData) podem demorar mais
   PAGE_SIZE: 24,
