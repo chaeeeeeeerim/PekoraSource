@@ -23,8 +23,9 @@ public class FrontendProxyMiddleware
 
     public static List<string> BypassUrls = new()
     {
+        // Kandi JSON API controllers must reach ASP.NET, never the legacy frontend proxy.
+        "/kandi/",
         // Pekora JSON API controllers must be handled by ASP.NET, never by the legacy frontend proxy.
-        "/apisite/",
         "/apisite/",
         "/swagger/",
         "/health",
@@ -42,7 +43,7 @@ public class FrontendProxyMiddleware
         "/IDE/welcome",
         "/ide/publish/editplace",
         "/IDE/Upload.aspx",
-        // Razor - Internal
+        // Internal
         "/internal/year",
         "/internal/updates",
         "/internal/promocodes",
